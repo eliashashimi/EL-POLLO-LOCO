@@ -1,29 +1,21 @@
-class ImageHub {
+export class ImageHub {
     static START_PAGE = {
         landingPage: ["assets/img/9_intro_outro_screens/start/startscreen_1.png"],
     };
 
-    static BACKGROUND_OBJECTS_ONE = {
+    static BACKGROUND_OBJECT = {
         backgroundOne: [
             "assets/img/5_background/layers/3_third_layer/1.png",
             "assets/img/5_background/layers/2_second_layer/1.png",
             "assets/img/5_background/layers/1_first_layer/1.png",
         ],
-        cloudOne: "assets/img/5_background/layers/4_clouds/1.png",
-    };
-
-    static BACKGROUND_OBJECTS_TWO = {
         backgroundTwo: [
             "assets/img/5_background/layers/3_third_layer/2.png",
             "assets/img/5_background/layers/2_second_layer/2.png",
             "assets/img/5_background/layers/1_first_layer/2.png",
         ],
-        cloudTwo: "assets/img/5_background/layers/4_clouds/2.png",
+        cloud: ["assets/img/5_background/layers/4_clouds/1.png", "assets/img/5_background/layers/4_clouds/2.png"],
     };
-
-    // static CLOUDS = {
-    //     clouds:
-    // };
 
     static PEPE = {
         run: [
@@ -99,7 +91,7 @@ class ImageHub {
             "assets/img/3_enemies_chicken/chicken_normal/1_walk/2_w.png",
             "assets/img/3_enemies_chicken/chicken_normal/1_walk/3_w.png",
         ],
-        dead: ["assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png"],
+        dead: "assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png",
     };
 
     static SMALLCHICKEN = {
@@ -108,7 +100,7 @@ class ImageHub {
             "assets/img/3_enemies_chicken/chicken_small/1_walk/1_w.png",
             "assets/img/3_enemies_chicken/chicken_small/1_walk/1_w.png",
         ],
-        dead: ["assets/img/3_enemies_chicken/chicken_small/2_dead/dead.png"],
+        dead: "assets/img/3_enemies_chicken/chicken_small/2_dead/dead.png",
     };
 
     static ENDBOSS = {
@@ -167,7 +159,7 @@ class ImageHub {
     };
 
     static COINS = {
-        coins: "assets/img/8_coin/coin_2.png",
+        coins: ["assets/img/8_coin/coin_1.png", "assets/img/8_coin/coin_2.png"],
     };
 
     static STATUSBAR = {

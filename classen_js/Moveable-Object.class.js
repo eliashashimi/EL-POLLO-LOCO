@@ -1,4 +1,6 @@
-class MoveableObjects {
+import { World } from "./World.class.js ";
+
+export class MoveableObject extends World {
     x;
     y;
     img;
@@ -13,7 +15,12 @@ class MoveableObjects {
     energy = 100;
     lastHit = 0;
 
-    moveRight() {
-        console.log("move right");
+    loadImage(path) {
+        this.img = new Image();
+        this.img.src = path;
     }
+
+    moveRight() {}
+
+    moveLeft() {}
 }
