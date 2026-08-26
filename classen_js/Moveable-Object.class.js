@@ -1,12 +1,9 @@
-import { ImageHub } from "./ImageHub.class.js";
-import { World } from "./world.class.js";
-
-export class MoveableObject extends World {
+export class MoveableObject {
     x;
     y;
     img;
-    height = 150;
-    width = 100;
+    height;
+    width;
     imageCache = {};
     currentImage = 0;
     speed = 0.15;
@@ -17,7 +14,7 @@ export class MoveableObject extends World {
     lastHit = 0;
 
     loadImage(path) {
-        this.img = new ImageHub();
+        this.img = new Image(); // das selbe wie = document.getElementById
         this.img.src = path;
     }
 

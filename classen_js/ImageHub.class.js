@@ -4,6 +4,7 @@ export class ImageHub {
     };
 
     static BACKGROUND_OBJECT = {
+        air: ["assets/img/5_background/layers/air.png"],
         backgroundOne: [
             "assets/img/5_background/layers/3_third_layer/1.png",
             "assets/img/5_background/layers/2_second_layer/1.png",
