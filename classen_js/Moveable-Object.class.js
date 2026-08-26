@@ -1,4 +1,5 @@
-import { World } from "./World.class.js ";
+import { ImageHub } from "./ImageHub.class.js";
+import { World } from "./world.class.js";
 
 export class MoveableObject extends World {
     x;
@@ -16,7 +17,7 @@ export class MoveableObject extends World {
     lastHit = 0;
 
     loadImage(path) {
-        this.img = new Image();
+        this.img = new ImageHub();
         this.img.src = path;
     }
 
