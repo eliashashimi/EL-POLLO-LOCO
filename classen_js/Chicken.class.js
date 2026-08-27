@@ -13,7 +13,6 @@ export class Chicken extends MoveableObject {
 
         this.x = 200 + Math.random() * 500;
         this.speed = 0.15 + Math.random() * 0.25;
-
         this.animate();
     }
 
@@ -27,6 +26,4 @@ export class Chicken extends MoveableObject {
             this.currentImage++;
         }, 1000 / 10);
     }
-
-    moveLeft() {}
 }

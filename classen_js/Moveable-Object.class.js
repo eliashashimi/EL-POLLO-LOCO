@@ -31,7 +31,7 @@ export class MoveableObject {
     moveRight() {}
 
     moveLeft() {
-        IntervalHub.startInterval(() => {
+        setInterval(() => {
             this.x -= this.speed;
             // if (this.x <= -this.width) this.x = this.width * 2;
         }, 1000 / 60);
