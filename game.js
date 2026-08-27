@@ -1,5 +1,4 @@
-import { Keyboard } from "./classen_js/Keyboard.class.js";
-import { World } from "./classen_js/World.class.js ";
+import { World } from "./classen_js/world.class.js ";
 
 let canvas;
 let world;

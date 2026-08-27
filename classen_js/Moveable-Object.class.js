@@ -1,8 +1,6 @@
-import { IntervalHub } from "./IntervalHub.class.js";
-
 export class MoveableObject {
-    x;
-    y;
+    x = 0;
+    y = 0;
     img;
     height;
     width;

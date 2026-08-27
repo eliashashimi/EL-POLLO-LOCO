@@ -1,8 +1,8 @@
-import { BackgroundObject } from "./Background-Object.class.js";
-import { Character } from "./Character.class.js ";
-import { Chicken } from "./Chicken.class.js";
+import { BackgroundObject } from "./background-object.class.js";
+import { Character } from "./character.class.js";
+import { Chicken } from "./chicken.class.js";
 import { Cloud } from "./cloud.class.js";
-import { ImageHub } from "./ImageHub.class.js";
+import { ImageHub } from "./image-hub.class.js";
 
 export class World {
     character = new Character();
@@ -10,6 +10,7 @@ export class World {
     clouds = [new Cloud()];
     static canvas;
     backgroundObjects;
+
     ctx;
     camera_x = 0;
     // statusBar = new this.statusBar();
@@ -30,10 +31,12 @@ export class World {
     draw() {
         this.ctx.clearRect(0, 0, World.canvas.width, World.canvas.height);
 
+        this.ctx.translate(this.camera_x, 0);
         this.addObjectsToMap(this.backgroundObjects);
         this.addToMap(this.character);
         this.addObjectsToMap(this.enemies);
         this.addObjectsToMap(this.clouds);
+        this.ctx.translate(-this.camera_x, 0);
 
         // Durch das requestAnimation wird die Draw Methode immer wieder aufgerufen
         requestAnimationFrame(() => this.draw());

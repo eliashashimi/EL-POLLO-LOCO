@@ -1,3 +1,3 @@
-import { Chicken } from "./Chicken.class.js";
+import { Chicken } from "./chicken.class.js";
 
 export class NormalChicken extends Chicken {}
