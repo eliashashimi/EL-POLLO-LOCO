@@ -1,3 +1,6 @@
+import { Keyboard } from "./classen_js/keyboard.class.js";
+import { World } from "./classen_js/world.class.js";
+
 let canvas;
 let world;
 let keyboard = new Keyboard();
@@ -5,7 +8,8 @@ let keyboard = new Keyboard();
 // function die den code ausführt
 function init() {
     canvas = document.getElementById("canvas");
-    world = new World(canvas, keyboard);
+    world = new World();
+    // world = new W(canvas, keyboard);
 }
 // scriptmodule benötigt window, mit onload funktioniert das nicht
 window.addEventListener("load", init);

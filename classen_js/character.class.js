@@ -1,3 +1,8 @@
+import { ImageHub } from "./image-hub.class.js";
+import { IntervalHub } from "./interval-hub.class.js";
+import { Keyboard } from "./keyboard.class.js";
+import { MoveableObject } from "./moveable-object.class.js";
+
 export class Character extends MoveableObject {
     x = 100;
     y = 150;
@@ -22,7 +27,7 @@ export class Character extends MoveableObject {
                 this.x -= this.speed;
                 this.otherDirection = true;
             }
-            this.W.camera_x = -this.x;
+            this.camera_x = -this.x;
         }, 1000 / 60);
 
         IntervalHub.startInterval(() => {

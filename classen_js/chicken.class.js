@@ -1,3 +1,7 @@
+import { ImageHub } from "./image-hub.class.js";
+import { IntervalHub } from "./interval-hub.class.js";
+import { MoveableObject } from "./moveable-object.class.js";
+
 export class Chicken extends MoveableObject {
     y = 420;
     width = 80;
