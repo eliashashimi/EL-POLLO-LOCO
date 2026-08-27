@@ -13,6 +13,11 @@ export class World {
         new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundOne[0]),
         new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundOne[1]),
         new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundOne[2]),
+
+        // new BackgroundObject(ImageHub.BACKGROUND_OBJECT.air[0]),
+        // new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundTwo[0]),
+        // new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundTwo[1]),
+        // new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundTwo[2]),
     ];
     canvas;
     ctx;
@@ -31,9 +36,9 @@ export class World {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.addObjectsToMap(this.backgroundObjects);
-        this.addObjectsToMap(this.clouds);
         this.addToMap(this.character);
         this.addObjectsToMap(this.enemies);
+        this.addObjectsToMap(this.clouds);
 
         // Durch das requestAnimation wird die Draw Methode immer wieder aufgerufen
         requestAnimationFrame(() => this.draw());
@@ -46,7 +51,7 @@ export class World {
     }
 
     addToMap(mo) {
-        this.ctx.drawImage(mo.img, mo.x, mo.y, mo.height, mo.width);
-        // console.log(mo, mo.img, mo.x, mo.y, mo.height, mo.width);
+        this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
+        console.log(mo.img);
     }
 }
