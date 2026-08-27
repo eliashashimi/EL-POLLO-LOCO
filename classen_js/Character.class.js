@@ -7,29 +7,22 @@ export class Character extends MoveableObject {
     y = 150;
     width = 200;
     height = 350;
-    Images_Walking = [
-        ImageHub.PEPE.walk[0],
-        ImageHub.PEPE.walk[1],
-        ImageHub.PEPE.walk[2],
-        ImageHub.PEPE.walk[3],
-        ImageHub.PEPE.walk[4],
-        ImageHub.PEPE.walk[5],
-    ];
+
     constructor() {
         super();
         this.loadImage(ImageHub.PEPE.idle[0]);
-        this.loadImages(this.Images_Walking);
+        this.loadImages(ImageHub.PEPE.walk);
 
         this.animate();
     }
 
     animate() {
         IntervalHub.startInterval(() => {
-            let i = this.currentImage % this.Images_Walking.length;
-            let path = this.Images_Walking[this.currentImage];
+            const i = this.currentImage % ImageHub.PEPE.walk.length;
+            let path = ImageHub.PEPE.walk[i];
             this.img = this.imageCache[path];
             this.currentImage++;
-        }, 1000);
+        }, 1000 / 12);
     }
 
     jump() {}

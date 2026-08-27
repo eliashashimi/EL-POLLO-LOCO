@@ -51,7 +51,7 @@ export class World {
     }
 
     addToMap(mo) {
+        console.log(mo);
         this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
-        console.log(mo.img);
     }
 }
