@@ -1,5 +1,7 @@
-import { ImageHub } from "./image-hub.class.js";
-import { IntervalHub } from "./interval-hub.class.js";
+import { ImageHub } from "./image-hub.class";
+import { IntervalHub } from "./interval-hub.class";
+import { Keyboard } from "./keyboard.class.js ";
+import { MoveableObject } from "./moveable-object.class.js ";
 
 export class Character extends MoveableObject {
     x = 100;

@@ -1,6 +1,5 @@
-import { BackgroundObject } from "./background-object.class.js";
 import { Character } from "./character.class.js";
-import { Chicken } from "./chicken.class.js";
+import { Chicken } from "./chicken.class.js ";
 import { Cloud } from "./cloud.class.js";
 import { ImageHub } from "./image-hub.class.js";
 

@@ -1,4 +1,5 @@
-import { ImageHub } from "./image-hub.class.js";
+import { ImageHub } from "./image-hub.class";
+import { MoveableObject } from "./moveable-object.class.js ";
 
 export class Cloud extends MoveableObject {
     y = 40;
