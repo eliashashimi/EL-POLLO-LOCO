@@ -2,6 +2,7 @@ import { ImageHub } from "./image-hub.class.js";
 import { IntervalHub } from "./interval-hub.class.js";
 import { Keyboard } from "./keyboard.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
+import { World } from "./world.class.js";
 
 export class Character extends MoveableObject {
     x = 100;
@@ -19,15 +20,16 @@ export class Character extends MoveableObject {
 
     animate() {
         IntervalHub.startInterval(() => {
-            if (Keyboard.RIGHT) {
+            if (Keyboard.RIGHT && this.x < 2880) {
                 this.x += this.speed;
                 this.otherDirection = false;
             }
-            if (Keyboard.LEFT) {
+            if (Keyboard.LEFT && this.x > 0) {
                 this.x -= this.speed;
                 this.otherDirection = true;
             }
-            this.camera_x = -this.x;
+            World.camera_x = -this.x + 100;
+            // console.log(this.camera_x);
         }, 1000 / 60);
 
         IntervalHub.startInterval(() => {

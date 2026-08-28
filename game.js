@@ -8,7 +8,7 @@ let keyboard = new Keyboard();
 // function die den code ausführt
 function init() {
     canvas = document.getElementById("canvas");
-    world = new World();
+    world = new World(canvas);
     // world = new W(canvas, keyboard);
 }
 // scriptmodule benötigt window, mit onload funktioniert das nicht

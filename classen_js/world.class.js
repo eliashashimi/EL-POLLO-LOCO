@@ -1,15 +1,13 @@
+import { addLevel1 } from "../levels/level1.js";
 import { Character } from "./character.class.js";
-import { Chicken } from "./chicken.class.js";
-import { Cloud } from "./cloud.class.js";
-import { ImageHub } from "./image-hub.class.js";
 
 export class World {
+    level;
     character = new Character();
-    enemies = [new Chicken(), new Chicken(), new Chicken()];
-    clouds = [new Cloud()];
-    static canvas;
+    chickens;
+    clouds;
     backgroundObjects;
-
+    static canvas;
     ctx;
     camera_x = 0;
     // statusBar = new this.statusBar();
@@ -18,24 +16,21 @@ export class World {
     constructor(canvas) {
         this.ctx = canvas.getContext("2d");
         World.canvas = canvas;
-        this.backgroundObjects = [
-            new BackgroundObject(ImageHub.BACKGROUND_OBJECT.air[0]),
-            new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundOne[0]),
-            new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundOne[1]),
-            new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundOne[2]),
-        ];
+        this.level = addLevel1();
         this.draw();
     }
 
     draw() {
         this.ctx.clearRect(0, 0, World.canvas.width, World.canvas.height);
 
-        this.ctx.translate(this.camera_x, 0);
-        this.addObjectsToMap(this.backgroundObjects);
+        this.ctx.translate(World.camera_x, 0);
+
+        this.addObjectsToMap(this.level.backgroundObjects);
         this.addToMap(this.character);
-        this.addObjectsToMap(this.enemies);
-        this.addObjectsToMap(this.clouds);
-        this.ctx.translate(-this.camera_x, 0);
+        this.addObjectsToMap(this.level.chickens);
+        this.addObjectsToMap(this.level.clouds);
+
+        this.ctx.translate(-World.camera_x, 0);
 
         // Durch das requestAnimation wird die Draw Methode immer wieder aufgerufen
         requestAnimationFrame(() => this.draw());
