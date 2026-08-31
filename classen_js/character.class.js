@@ -13,8 +13,11 @@ export class Character extends MoveableObject {
     constructor() {
         super();
         this.loadImage(ImageHub.PEPE.idle[0]);
+        this.loadImages(ImageHub.PEPE.longIdle);
         this.loadImages(ImageHub.PEPE.walk);
         this.loadImages(ImageHub.PEPE.jump);
+        this.loadImages(ImageHub.PEPE.hurt);
+        this.loadImages(ImageHub.PEPE.dead);
         this.applyGravity();
         this.getRealFrame();
         this.animate();
@@ -36,7 +39,11 @@ export class Character extends MoveableObject {
         }, 1000 / 60);
 
         IntervalHub.startInterval(() => {
-            if (this.isAboveGround()) {
+            if (this.isHurt()) {
+                this.playAnimation(ImageHub.PEPE.hurt);
+            } else if (this.isDead()) {
+                this.playAnimation(ImageHub.PEPE.dead);
+            } else if (this.isAboveGround()) {
                 this.playAnimation(ImageHub.PEPE.jump);
             } else {
                 if (Keyboard.RIGHT || Keyboard.LEFT) {

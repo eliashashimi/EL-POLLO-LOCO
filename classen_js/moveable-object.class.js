@@ -1,29 +1,23 @@
+import { DrawableObject } from "./drawable-object.class.js";
 import { IntervalHub } from "./interval-hub.class.js";
 
-export class MoveableObject {
-    rX;
-    rY;
-    rW;
-    rH;
-    x = 0;
-    y = 0;
-    img;
-    width;
-    height;
-    imageCache = {};
-    currentImage = 0;
+export class MoveableObject extends DrawableObject {
     speed = 0.15;
-    otherDirection = false;
     speedY = 0;
+    otherDirection = false;
     acceleration = 2.5;
     energy = 100;
     lastHit = 0;
     offset = {
         top: 100,
-        right: 50,
-        bottom: 50,
-        left: 50,
+        right: 30,
+        bottom: 20,
+        left: 30,
     };
+
+    constructor() {
+        super();
+    }
 
     applyGravity() {
         IntervalHub.startInterval(() => {
@@ -38,48 +32,26 @@ export class MoveableObject {
         return this.y < 135;
     }
 
-    loadImage(path) {
-        this.img = new Image(); // das selbe wie = document.getElementById
-        this.img.src = path;
-    }
-
-    loadImages(arr) {
-        arr.forEach((path) => {
-            let img = new Image();
-            img.src = path;
-            this.imageCache[path] = img;
-        });
-    }
-
-    draw(ctx) {
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-    }
-
-    drawFrame(ctx) {
-        ctx.beginPath();
-        ctx.linewidth = "5";
-        ctx.strokeStyle = "blue";
-        ctx.rect(this.x, this.y, this.width, this.height);
-        ctx.stroke();
-    }
-
-    getRealFrame() {
-        this.rX = this.x + this.offset.left;
-        this.rY = this.y + this.offset.top;
-        this.rW = this.width - this.offset.left - this.offset.right;
-        this.rH = this.height - this.offset.top - this.offset.bottom;
-    }
-
-    drawRealFrame(ctx) {
-        ctx.beginPath();
-        ctx.linewidth = "2";
-        ctx.strokeStyle = "red";
-        ctx.rect(this.rX, this.rY, this.rW, this.rH);
-        ctx.stroke();
-    }
-
     isColliding(mO) {
+        // console.log(mO);
         return this.rX + this.rW > mO.rX && this.rY + this.rH > mO.rY && this.rX < mO.rX + mO.rW && this.rY < mO.rY + mO.rH;
+    }
+
+    hit() {
+        this.energy -= 5;
+        if (this.energy < 0) {
+            this.energy = 0;
+        }
+    }
+
+    isHurt() {
+        let timePassed = new Date().getTime() - this.lastHit;
+        timePassed = timePassed / 1000;
+        return timePassed < 1;
+    }
+
+    isDead() {
+        return this.energy === 0;
     }
 
     moveRight() {

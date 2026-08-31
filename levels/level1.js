@@ -4,11 +4,21 @@ import { Cloud } from "../classen_js/cloud.class.js";
 import { Endboss } from "../classen_js/endboss.class.js";
 import { ImageHub } from "../classen_js/image-hub.class.js";
 import { Level } from "../classen_js/level.class.js";
+import { SmallChicken } from "../classen_js/small-chicken.class.js";
 
 export function addLevel1() {
     return new Level(
-        [new Chicken(), new Chicken(), new Chicken(), new Endboss()],
-        [new Cloud()],
+        [new Chicken(), new Chicken(), new Chicken(), new SmallChicken(), new SmallChicken(), new SmallChicken(), new Endboss()],
+        [
+            new Cloud(),
+            // new Cloud(ImageHub.BACKGROUND_OBJECT.cloud[1], 0),
+
+            // new Cloud(ImageHub.BACKGROUND_OBJECT.cloud[0], 960),
+            // new Cloud(ImageHub.BACKGROUND_OBJECT.cloud[1], 960),
+
+            // new Cloud(ImageHub.BACKGROUND_OBJECT.cloud[0], 960 * 2),
+            // new Cloud(ImageHub.BACKGROUND_OBJECT.cloud[1], 960 * 2),
+        ],
         [
             new BackgroundObject(ImageHub.BACKGROUND_OBJECT.air[0], -960),
             new BackgroundObject(ImageHub.BACKGROUND_OBJECT.backgroundTwo[0], -960),

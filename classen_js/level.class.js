@@ -1,13 +1,11 @@
 export class Level {
-    backgroundObjects;
-    clouds;
     chickens;
-    endboss;
+    clouds;
+    backgroundObjects;
 
-    constructor(backgroundObjects, clouds, chickens, endboss) {
-        this.backgroundObjects = backgroundObjects;
-        this.clouds = clouds;
+    constructor(chickens, clouds, backgroundObjects) {
         this.chickens = chickens;
-        this.endboss = endboss;
+        this.clouds = clouds;
+        this.backgroundObjects = backgroundObjects;
     }
 }
