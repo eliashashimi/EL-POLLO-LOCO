@@ -8,7 +8,7 @@ export class Endboss extends MoveableObject {
     constructor() {
         super().loadImage(ImageHub.ENDBOSS.alert[0]);
         this.loadImages(ImageHub.ENDBOSS.alert);
-        this.x = 700;
+        this.x = 3400;
         this.y = 15;
 
         this.animate();

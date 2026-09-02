@@ -13,8 +13,6 @@ export class StatusbarHealth extends DrawableObject {
     }
 
     setPercentage(percentage) {
-        console.log(percentage);
-
         this.percentage = percentage;
         let path = ImageHub.STATUSBAR.health[this.resolveImageIndex()];
         this.img = this.imageCache[path];

@@ -2,6 +2,7 @@ import { DrawableObject } from "./drawable-object.class.js";
 import { ImageHub } from "./image-hub.class.js";
 
 export class StatusbarBottle extends DrawableObject {
+    percentage = 0;
     constructor() {
         super();
         this.loadImages(ImageHub.STATUSBAR.bottles);
@@ -21,13 +22,13 @@ export class StatusbarBottle extends DrawableObject {
     resolveImageIndexBottle() {
         if (this.percentageBottle === 0) {
             return 0;
-        } else if (this.percentageBottle === 20) {
+        } else if (this.percentageBottle <= 20) {
             return 1;
-        } else if (this.percentageBottle === 40) {
+        } else if (this.percentageBottle <= 40) {
             return 2;
-        } else if (this.percentageBottle === 60) {
+        } else if (this.percentageBottle <= 60) {
             return 3;
-        } else if (this.percentageBottle === 80) {
+        } else if (this.percentageBottle <= 80) {
             return 4;
         } else {
             return 5;

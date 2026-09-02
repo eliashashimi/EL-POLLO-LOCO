@@ -2,6 +2,7 @@ import { DrawableObject } from "./drawable-object.class.js";
 import { ImageHub } from "./image-hub.class.js";
 
 export class StatusbarCoin extends DrawableObject {
+    percentageCoin = 0;
     constructor() {
         super();
         this.loadImages(ImageHub.STATUSBAR.coins);
@@ -19,15 +20,15 @@ export class StatusbarCoin extends DrawableObject {
     }
 
     resolveImageIndexCoin() {
-        if (this.percentageCoin === 0) {
+        if (this.percentageCoin == 0) {
             return 0;
-        } else if (this.percentageCoin === 20) {
+        } else if (this.percentageCoin <= 20) {
             return 1;
-        } else if (this.percentageCoin === 40) {
+        } else if (this.percentageCoin <= 40) {
             return 2;
-        } else if (this.percentageCoin === 60) {
+        } else if (this.percentageCoin <= 60) {
             return 3;
-        } else if (this.percentageCoin === 80) {
+        } else if (this.percentageCoin <= 80) {
             return 4;
         } else {
             return 5;

@@ -5,16 +5,9 @@ export class ImageHub {
 
     static BACKGROUND_OBJECT = {
         air: ["assets/img/5_background/layers/air.png"],
-        backgroundOne: [
-            "assets/img/5_background/layers/3_third_layer/1.png",
-            "assets/img/5_background/layers/2_second_layer/1.png",
-            "assets/img/5_background/layers/1_first_layer/1.png",
-        ],
-        backgroundTwo: [
-            "assets/img/5_background/layers/3_third_layer/2.png",
-            "assets/img/5_background/layers/2_second_layer/2.png",
-            "assets/img/5_background/layers/1_first_layer/2.png",
-        ],
+        backgroundThree: ["assets/img/5_background/layers/3_third_layer/1.png", "assets/img/5_background/layers/3_third_layer/2.png"],
+        backgroundTwo: ["assets/img/5_background/layers/2_second_layer/1.png", "assets/img/5_background/layers/2_second_layer/2.png"],
+        backgroundOne: ["assets/img/5_background/layers/1_first_layer/1.png", "assets/img/5_background/layers/1_first_layer/2.png"],
         cloud: ["assets/img/5_background/layers/4_clouds/1.png", "assets/img/5_background/layers/4_clouds/2.png"],
     };
 
@@ -64,8 +57,8 @@ export class ImageHub {
         ],
         hurt: [
             "assets/img/2_character_pepe/4_hurt/H-41.png",
-            "assets/img/2_character_pepe/4_hurt/H-41.png",
-            "assets/img/2_character_pepe/4_hurt/H-41.png",
+            "assets/img/2_character_pepe/4_hurt/H-42.png",
+            "assets/img/2_character_pepe/4_hurt/H-43.png",
         ],
         dead: [
             "assets/img/2_character_pepe/5_dead/D-51.png",

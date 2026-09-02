@@ -7,6 +7,8 @@ export class MoveableObject extends DrawableObject {
     otherDirection = false;
     acceleration = 2.5;
     energy = 100;
+    addCoin = 0;
+    addBottle = 0;
     lastHit = 0;
     offset = {
         top: 100,
@@ -33,7 +35,6 @@ export class MoveableObject extends DrawableObject {
     }
 
     isColliding(mO) {
-        // console.log(mO);
         return this.rX + this.rW > mO.rX && this.rY + this.rH > mO.rY && this.rX < mO.rX + mO.rW && this.rY < mO.rY + mO.rH;
     }
 
@@ -41,6 +42,29 @@ export class MoveableObject extends DrawableObject {
         this.energy -= 5;
         if (this.energy < 0) {
             this.energy = 0;
+        } else {
+            this.lastHit = new Date().getTime();
+        }
+    }
+
+    addCoin() {
+        this.addCoin += 10;
+        if (this.addCoin > 100) {
+            this.addCoin = 100;
+        }
+    }
+
+    addBottle() {
+        this.addBottle += 10;
+        if (this.addBottle > 100) {
+            this.addBottle = 100;
+        }
+    }
+
+    removeBottle() {
+        this.removeBottle -= 10;
+        if (this.addBottle > 100) {
+            this.addBottle = 100;
         }
     }
 
