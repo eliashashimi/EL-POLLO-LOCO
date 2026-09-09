@@ -4,16 +4,19 @@ import { IntervalHub } from "./interval-hub.class.js";
 export class MoveableObject extends DrawableObject {
     speed = 0.15;
     speedY = 0;
-    otherDirection = false;
     acceleration = 2.5;
     energy = 100;
     addCoin = 0;
     addBottle = 0;
     lastHit = 0;
+    isDeadEnemy = false;
+    movementInterval;
+    amount;
+
     offset = {
         top: 100,
         right: 30,
-        bottom: 20,
+        bottom: 0,
         left: 30,
     };
 
@@ -23,6 +26,7 @@ export class MoveableObject extends DrawableObject {
 
     applyGravity() {
         IntervalHub.startInterval(() => {
+            if (window.isGamePaused) return;
             if (this.isAboveGround() || this.speedY > 0) {
                 this.y -= this.speedY;
                 this.speedY -= this.acceleration;
@@ -39,25 +43,11 @@ export class MoveableObject extends DrawableObject {
     }
 
     hit() {
-        this.energy -= 5;
+        this.energy -= 10;
         if (this.energy < 0) {
             this.energy = 0;
         } else {
             this.lastHit = new Date().getTime();
-        }
-    }
-
-    addCoin() {
-        this.addCoin += 10;
-        if (this.addCoin > 100) {
-            this.addCoin = 100;
-        }
-    }
-
-    addBottle() {
-        this.addBottle += 10;
-        if (this.addBottle > 100) {
-            this.addBottle = 100;
         }
     }
 
@@ -71,20 +61,34 @@ export class MoveableObject extends DrawableObject {
     isHurt() {
         let timePassed = new Date().getTime() - this.lastHit;
         timePassed = timePassed / 1000;
-        return timePassed < 1;
+        return timePassed < 4;
     }
 
     isDead() {
         return this.energy === 0;
     }
 
+    killEnemy(deadImagePath) {
+        this.isDeadEnemy = true;
+        this.speed = 0;
+
+        if (this.movementInterval) {
+            IntervalHub.stopInterval(this.movementInterval);
+        }
+        if (deadImagePath) {
+            this.loadImage(deadImagePath);
+        }
+    }
+
     moveRight() {
+        if (window.isGamePaused) return;
         this.x += this.speed;
         this.otherDirection = false;
     }
 
     moveLeft() {
-        setInterval(() => {
+        this.movementInterval = IntervalHub.startInterval(() => {
+            if (window.isGamePaused) return;
             this.x -= this.speed;
         }, 1000 / 60);
     }

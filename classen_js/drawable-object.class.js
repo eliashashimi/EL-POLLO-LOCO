@@ -10,14 +10,27 @@ export class DrawableObject {
     height;
     imageCache = {};
     currentImage = 0;
+    otherDirection = false;
 
     loadImage(path) {
         this.img = new Image(); // das selbe wie = document.getElementById
         this.img.src = path;
     }
 
+    // draw(ctx) {
+    //     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    // }
+
     draw(ctx) {
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        if (this.otherDirection) {
+            ctx.save();
+            ctx.translate(this.x + this.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(this.img, 0, this.y, this.width, this.height);
+            ctx.restore();
+        } else {
+            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        }
     }
 
     drawFrame(ctx) {

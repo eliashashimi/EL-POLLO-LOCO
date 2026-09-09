@@ -24,11 +24,12 @@ export class CollectableBottles extends MoveableObject {
 
     animate() {
         setInterval(() => {
+            if (window.isGamePaused) return;
             this.playAnimation(ImageHub.SALSA_BOTTLE.onground);
         }, 1000 / 3);
     }
 
     position() {
-        this.x = 200 + Math.random() * 2000;
+        this.x = 200 + Math.random() * 2500;
     }
 }

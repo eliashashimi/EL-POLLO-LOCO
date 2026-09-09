@@ -5,18 +5,22 @@ import { World } from "./world.class.js";
 
 export class Level {
     chickens;
+    endboss;
     clouds = [];
     backgroundObjects = [];
-    step = World.canvas.width;
+    step;
     sections = 4;
     collectableCoins;
     collectableBottles;
 
-    constructor(sections, chickens, collectableCoins, collectableBottles) {
-        this.addBg(sections);
+    constructor(sections, chickens, endboss, collectableCoins, collectableBottles) {
+        this.sections = sections;
         this.chickens = chickens;
+        this.endboss = endboss;
         this.collectableCoins = collectableCoins;
         this.collectableBottles = collectableBottles;
+        this.step = World.canvas ? World.canvas.width : 960;
+        this.addBg();
     }
 
     addBg() {

@@ -23,6 +23,7 @@ export class CollectableCoins extends MoveableObject {
 
     animate() {
         setInterval(() => {
+            if (window.isGamePaused) return;
             this.playAnimation(ImageHub.COINS.coins);
         }, 1000 / 3);
     }
