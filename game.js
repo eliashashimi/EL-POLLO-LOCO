@@ -6,6 +6,11 @@ import { World } from "./classen_js/world.class.js";
 let world;
 let canvas;
 let isPaused;
+let globalVolume = 0.4;
+let highGraphics = true;
+const volumeSlider = document.getElementById("volume-slider");
+const volumeValue = document.getElementById("volume-value");
+const btnGraphics = document.getElementById("btn-graphics");
 const landingPage = document.getElementById("landing-page");
 const settingsScreen = document.getElementById("settings-screen");
 const howtoScreen = document.getElementById("howto-screen");
@@ -28,8 +33,11 @@ function init() {
     canvas = document.getElementById("canvas");
     hideEndScreens();
     initAudioSettings();
+
+    window.isGameOver = false;
+    world = new World(canvas);
 }
-window.addEventListener("load", init);
+// window.addEventListener("load", init);
 
 function hideEndScreens() {
     if (gameOverScreen) gameOverScreen.classList.add("d-none");
@@ -39,6 +47,12 @@ function hideEndScreens() {
 function initAudioSettings() {
     const savedMuteStatus = localStorage.getItem("elPolloLoco_muted");
     AudioHub.IS_MUTED = savedMuteStatus === "true";
+    const savedVolume = localStorage.getItem("elPolloLoco_volume");
+    if (savedVolume !== null) {
+        globalVolume = parseFloat(savedVolume);
+        if (volumeSlider) volumeSlider.value = globalVolume * 100;
+        if (volumeValue) volumeValue.innerText = Math.round(globalVolume * 100) + "%";
+    }
     updateMuteButtonUI();
 }
 
@@ -62,16 +76,37 @@ function updateMuteButtonUI() {
         ingameMuteIcon.src = iconSrc;
         ingameMuteIcon.alt = altText;
     }
+}
 
-    //     if (muteIcon) {
-    //         muteIcon.src = "./assets/icons/volume-mute.svg";
-    //         muteIcon.alt = "Ton-Aus";
-    //     }
-    // } else {
-    //     if (muteIcon) {
-    //         muteIcon.src = "./assets/icons/volume-up.svg";
-    //         muteIcon.alt = "Ton-An";
-    //     }
+if (volumeSlider) {
+    volumeSlider.addEventListener("input", (e) => {
+        const sliderVal = e.target.value;
+        globalVolume = sliderVal / 100;
+        if (volumeValue) volumeValue.innerText = sliderVal + "%";
+        localStorage.setItem("elPolloLoco_volume", globalVolume);
+        AudioHub.ALL_SOUNDS.forEach((sound) => {
+            sound.file.volume = globalVolume;
+        });
+        if (sliderVal == 0 && !AudioHub.isMuted) {
+            toggleMute();
+        } else if (sliderVal > 0 && AudioHub.isMuted) {
+            toggleMute();
+        }
+    });
+}
+
+if (btnGraphics) {
+    btnGraphics.addEventListener("click", () => {
+        highGraphics = !highGraphics;
+        window.isLowGraphics = !highGraphics;
+        if (highGraphics) {
+            btnGraphics.innerText = "Qualität: Hoch";
+            btnGraphics.style.color = "#ffffff";
+        } else {
+            btnGraphics.innerText = "Qualität: Niedrig";
+            btnGraphics.style.color = "#ff9800";
+        }
+    });
 }
 
 function togglePause() {
@@ -85,9 +120,6 @@ function togglePause() {
         if (pauseScreen) pauseScreen.classList.remove("d-none");
     } else {
         if (pauseScreen) pauseScreen.classList.add("d-none");
-
-        // world.run();
-        // world.character.animate();
         if (!AudioHub.IS_MUTED) AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
     }
 }
@@ -97,14 +129,15 @@ if (btnStart) {
 }
 
 function startNewGame() {
+    hideEndScreens();
     landingPage.classList.add("d-none");
     if (ingameControls) ingameControls.classList.remove("d-none");
 
-    hideEndScreens();
     IntervalHub.stopAllInterval();
     AudioHub.STOP_ALL();
     isPaused = false;
-    world = new World(canvas);
+    window.isGameOver = false;
+    init();
 }
 
 document.querySelectorAll(".btn-home").forEach((btn) => {
@@ -173,6 +206,7 @@ function backToHome() {
 }
 
 window.showGameOver = function () {
+    window.isGameOver = true;
     AudioHub.STOP_ALL();
     AudioHub.PLAY_ONE(AudioHub.PEPE_DEAD);
     IntervalHub.stopAllInterval();
@@ -180,6 +214,7 @@ window.showGameOver = function () {
 };
 
 window.showGameWin = function () {
+    window.isGameOver = true;
     AudioHub.STOP_ALL();
     IntervalHub.stopAllInterval();
     if (gameWinScreen) gameWinScreen.classList.remove("d-none");
@@ -206,11 +241,6 @@ btnHowToBack.addEventListener("click", () => {
 });
 
 btnMute.addEventListener("click", toggleMute);
-
-btnStart.addEventListener("click", () => {
-    landingPage.classList.add("d-none");
-    world = new World(canvas);
-});
 
 window.addEventListener("keydown", (e) => {
     if (!world || isPaused) return;

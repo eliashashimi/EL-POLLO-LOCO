@@ -87,8 +87,7 @@ export class Endboss extends MoveableObject {
 
     firstHitWalking() {
         IntervalHub.startInterval(() => {
-            if (window.isGamePaused) return;
-            if (this.isDead() || !this.world || !this.world.character) return;
+            if (window.isGamePaused || this.isDead() || !this.world || !this.world.character) return;
             let cameraRightEdge = -World.camera_x + 960;
 
             if (!this.hadfirstSight && this.x < cameraRightEdge) {
@@ -109,20 +108,23 @@ export class Endboss extends MoveableObject {
     followCaracter() {
         this.followAttackCharacter();
         this.folloStopSmallDistance();
-        if (this.world.character.x < this.x) {
-            this.x -= this.speed;
-            this.otherDirection = false;
-        } else {
-            this.x += this.speed;
-            this.otherDirection = true;
+        if (this.speed > 0) {
+            if (this.world.character.x < this.x) {
+                this.x -= this.speed;
+                this.otherDirection = false;
+            } else {
+                this.x += this.speed;
+                this.otherDirection = true;
+            }
         }
     }
 
     folloStopSmallDistance() {
         let xDistance = Math.abs(this.x - this.world.character.x);
-        if (xDistance < 10) {
+        if (xDistance < 15) {
             this.speed = 0;
-            return;
+        } else if (this.speed === 0 && !this.isAlerting && !this.isHurted) {
+            this.speed = this.isAttacking ? 3.5 : 2.5;
         }
     }
 
@@ -130,24 +132,27 @@ export class Endboss extends MoveableObject {
         let distance = Math.abs(this.x - this.world.character.x);
         if (distance < 200) {
             this.isAttacking = true;
-            if (this.isColliding(this.world.character) && !this.world.character.isHurt()) {
+
+            if (distance < 80 && this.isColliding(this.world.character) && !this.world.character.isHurt()) {
                 this.world.character.hit();
                 this.world.statusbarHealth.setPercentage(this.world.character.energy);
             }
-            if (this.speed === 2.5) {
-                this.speed = 3.5;
-                setTimeout(() => {
-                    if (!this.isHurted && !this.isDead() && this.speed === 3.5) {
-                        this.isAttacking = false;
-                        this.speed = 2.5;
-                    }
-                }, 800);
-            }
-        } else {
-            if (this.speed < 4.5) {
-                this.isAttacking = false;
-                this.speed = 2.5;
-            }
+            this.triggerChargeSpeed();
+        } else if (this.speed < 4.5) {
+            this.isAttacking = false;
+            this.speed = 2.5;
+        }
+    }
+
+    triggerChargeSpeed() {
+        if (this.speed === 2.5) {
+            this.speed = 3.5;
+            setTimeout(() => {
+                if (!this.isHurted && !this.isDead() && this.speed === 3.5) {
+                    this.isAttacking = false;
+                    this.speed = 2.5;
+                }
+            }, 800);
         }
     }
 }

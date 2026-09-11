@@ -16,6 +16,8 @@ export class Level {
     constructor(sections, chickens, endboss, collectableCoins, collectableBottles) {
         this.sections = sections;
         this.chickens = chickens;
+        console.log(this.chickens);
+
         this.endboss = endboss;
         this.collectableCoins = collectableCoins;
         this.collectableBottles = collectableBottles;

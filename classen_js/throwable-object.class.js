@@ -1,3 +1,4 @@
+import { AudioHub } from "./audio-hub.class.js";
 import { ImageHub } from "./image-hub.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
 
@@ -38,6 +39,7 @@ export class ThrowableObject extends MoveableObject {
         this.amount--;
         this.applyGravity();
         this.throwInterval = setInterval(() => {
+            if (window.isGamePaused) return;
             if (this.otherDirection == true) {
                 this.x -= 20;
             } else {
@@ -60,6 +62,7 @@ export class ThrowableObject extends MoveableObject {
             this.throwBottleAir = false;
             this.speedY = 0;
             clearInterval(this.throwInterval);
+            AudioHub.PLAY_ONE(AudioHub.BOTTLE_BREAK);
         }
     }
 

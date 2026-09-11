@@ -20,24 +20,27 @@ export class World {
     static camera_x = 0;
     coins = 0;
     bottles = 0;
-    collectableCoins = addLevel1.collectableCoins;
-    collectableBottles = addLevel1.collectableBottles;
+    collectableCoins;
+    collectableBottles;
     statusbarHealth = new Statusbar("health", 20, 0, 100);
     statusbarCoins = new Statusbar("coins", 20, 40, 0);
     statusbarBottles = new Statusbar("bottles", 20, 80, 0);
     statusbarEndboss = new Statusbar("endBoss", 700, 0, 100);
     statusbar = {};
     throwableObjects = [];
+    isThrowing = false;
     maxWitdh;
     maxEnd;
     maxCameraPos;
 
     constructor(canvas) {
+        console.log("World erstellt");
+
         this.ctx = canvas.getContext("2d");
         World.canvas = canvas;
         this.level = addLevel1();
         this.character = new Character(this);
-        this.chickens = this.level.chickens;
+        // this.chickens = this.level.chickens;
         this.endboss = this.level.endboss;
         if (this.endboss) this.endboss.world = this;
         this.maxWidth = this.level.step + World.canvas.width;
@@ -58,14 +61,17 @@ export class World {
         setInterval(() => {
             if (window.isGamePaused) return;
             this.checkThrowableObjects();
+            // console.log(this.level.chickens);
         }, 1000 / 5);
     }
 
     checkThrowableObjects() {
-        if (Keyboard.Space && this.bottles > 0 && !this.character.isDead()) {
+        if (Keyboard.Space && this.bottles > 0 && !this.character.isDead() && !window.isGameOver && !this.isThrowing) {
+            this.isThrowing = true;
             const x = this.character.otherDirection ? this.character.x - 10 : this.character.x + 100;
             let bottle = new ThrowableObject(x, this.character.y + 150, this.character.otherDirection);
             this.throwableObjects.push(bottle);
+            this.character.lastMove = new Date().getTime();
             this.bottles--;
             this.statusbarBottles.setPercentage(this.bottles * 20);
         }
@@ -88,13 +94,16 @@ export class World {
             this.level.chickens.forEach((enemy) => {
                 this.checkBottleHitEnemy(enemy, bottle);
             });
-            if (this.endboss) this.checkBottleHitEndboss(this.endboss, bottle);
+            if (this.endboss && !bottle.bottleSplashed) this.checkBottleHitEndboss(this.endboss, bottle);
         });
         this.throwableObjects = this.throwableObjects.filter((bottle) => !bottle.throwBottleRemoved);
+        if (this.throwableObjects.length === 0 || this.throwableObjects.every((b) => b.bottleSplashed)) {
+            this.isThrowing = false;
+        }
     }
 
     checkBottleHitEnemy(enemy, bottle) {
-        if (!bottle && !enemy) return;
+        if (!bottle || !enemy || enemy.isDeadEnemy) return;
 
         if (bottle.isColliding(enemy) && (enemy instanceof Chicken || enemy instanceof SmallChicken)) {
             let deadImg = enemy instanceof Chicken ? ImageHub.CHICKEN.dead : ImageHub.SMALLCHICKEN.dead;
@@ -114,47 +123,67 @@ export class World {
             bottle.splash();
             AudioHub.PLAY_ONE(AudioHub.BOTTLE_BREAK);
             this.statusbarEndboss.setPercentage(enemy.energy);
-            if (enemy.isDead && enemy.isDead())
+            if (enemy.isDead()) {
                 setTimeout(() => {
                     window.showGameWin();
-                });
+                }, 1500);
+            }
         }
     }
 
     checkCollisionEndboss() {
-        if (this.endboss && !this.character.isImmuneAfterKill) {
-            if (this.character.isColliding(this.endboss)) {
-                if (!this.character.isHurt() && !this.character.isDead()) {
-                    this.character.hit();
-                    this.statusbarHealth.setPercentage(this.character.energy);
-                    AudioHub.PLAY_ONE(AudioHub.PEPE_DAMAGE);
-                }
+        if (!this.endboss || window.isGamePaused || window.isGameOver) return;
+        if (this.endboss.isDead && this.endboss.isDead()) return;
+
+        if (this.character.isColliding(this.endboss) && !this.character.isImmuneAfterKill) {
+            if (!this.character.isHurt() && !this.character.isDead()) {
+                this.character.hit();
+                this.statusbarHealth.setPercentage(this.character.energy);
+                AudioHub.PLAY_ONE(AudioHub.PEPE_DAMAGE);
             }
         }
     }
 
     checkCollisionEnemy() {
-        this.level.chickens.forEach((enemy, index) => {
-            if (enemy.isDeadEnemy) return;
+        if (window.isGamePaused || window.isGameOver) return;
+        this.level.chickens.forEach((enemy) => {
+            if (enemy.isDeadEnemy || enemy.energy === 0) return;
 
             if (this.character.isColliding(enemy)) {
-                if (this.character.isAboveGround() && this.character.speedY < 0) {
-                    const deadImg = enemy instanceof Chicken ? ImageHub.CHICKEN.dead : ImageHub.SMALLCHICKEN.dead;
-                    enemy.killEnemy(deadImg);
-                    enemy instanceof Chicken ? AudioHub.PLAY_ONE(AudioHub.CHICKEN_DEAD) : AudioHub.PLAY_ONE(AudioHub.SMALL_CHICKEN_DEAD);
-                    this.character.bounce();
-                    this.character.isImmuneAfterKill = true;
-                    setTimeout(() => {
-                        this.level.chickens.splice(index, 1);
-                        this.character.isImmuneAfterKill = false;
-                    }, 200);
-                } else if (!this.character.isHurt() && !this.character.isDead()) {
-                    this.character.hit();
-                    this.statusbarHealth.setPercentage(this.character.energy);
-                    AudioHub.PLAY_ONE(AudioHub.PEPE_DAMAGE);
-                }
+                this.handleEnemyCollisionType(enemy);
             }
         });
+    }
+
+    handleEnemyCollisionType(enemy) {
+        if (this.character.isAboveGround() && this.character.speedY < 0) {
+            this.executeEnemyDead(enemy);
+        } else if (!this.character.isHurt() && !this.character.isDead() && !this.character.isImmuneAfterKill) {
+            this.executePepeDamage();
+        }
+    }
+
+    executeEnemyDead(enemy) {
+        this.character.isImmuneAfterKill = true;
+        // enemy.isDeadEnemy = true;
+        enemy.energy = 0;
+
+        const deadImg = enemy instanceof Chicken ? ImageHub.CHICKEN.dead : ImageHub.SMALLCHICKEN.dead;
+        enemy.killEnemy(deadImg);
+        enemy instanceof Chicken ? AudioHub.PLAY_ONE(AudioHub.CHICKEN_DEAD) : AudioHub.PLAY_ONE(AudioHub.SMALL_CHICKEN_DEAD);
+
+        this.character.bounce();
+        setTimeout(() => {
+            const index = this.level.chickens.indexOf(enemy);
+            this.level.chickens.splice(index, 1);
+            this.character.isImmuneAfterKill = false;
+        }, 200);
+    }
+
+    executePepeDamage() {
+        this.character.hit();
+        this.statusbarHealth.setPercentage(this.character.energy);
+        AudioHub.PLAY_ONE(AudioHub.PEPE_DAMAGE);
     }
 
     checkCollisionCoins() {
@@ -162,7 +191,7 @@ export class World {
             if (this.character.isColliding(coins)) {
                 this.coins++;
                 this.level.collectableCoins.splice(index, 1);
-                this.statusbarCoins.setPercentage(this.coins * 10);
+                this.statusbarCoins.setPercentage(Math.round(this.coins * 3.33));
                 AudioHub.PLAY_ONE(AudioHub.COLLECT_COIN);
             }
         });
@@ -173,7 +202,7 @@ export class World {
             if (this.character.isColliding(bottle)) {
                 this.bottles++;
                 this.level.collectableBottles.splice(index, 1);
-                this.statusbarBottles.setPercentage(this.bottles * 20);
+                this.statusbarBottles.setPercentage(this.bottles * 10);
                 AudioHub.PLAY_ONE(AudioHub.COLLECT_BOTTLE);
             }
         });

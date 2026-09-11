@@ -13,10 +13,11 @@ export class CollectableCoins extends MoveableObject {
         bottom: 60,
     };
 
-    constructor() {
+    constructor(x, y) {
         super().loadImage(ImageHub.COINS.coins[0]);
         this.loadImages(ImageHub.COINS.coins);
-        this.position();
+        this.x = x;
+        this.y = y;
         this.getRealFrame();
         this.animate();
     }
@@ -26,10 +27,5 @@ export class CollectableCoins extends MoveableObject {
             if (window.isGamePaused) return;
             this.playAnimation(ImageHub.COINS.coins);
         }, 1000 / 3);
-    }
-
-    position() {
-        this.x = 200 + Math.random() * 2500;
-        this.y = 135 + Math.random() * 250;
     }
 }

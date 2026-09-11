@@ -8,7 +8,7 @@ export class MoveableObject extends DrawableObject {
     energy = 100;
     addCoin = 0;
     addBottle = 0;
-    lastHit = 0;
+    lastHit = new Date().getTime();
     isDeadEnemy = false;
     movementInterval;
     amount;
@@ -44,10 +44,9 @@ export class MoveableObject extends DrawableObject {
 
     hit() {
         this.energy -= 10;
+        this.lastHit = new Date().getTime();
         if (this.energy < 0) {
             this.energy = 0;
-        } else {
-            this.lastHit = new Date().getTime();
         }
     }
 
@@ -61,7 +60,7 @@ export class MoveableObject extends DrawableObject {
     isHurt() {
         let timePassed = new Date().getTime() - this.lastHit;
         timePassed = timePassed / 1000;
-        return timePassed < 4;
+        return timePassed < 1;
     }
 
     isDead() {
@@ -94,7 +93,7 @@ export class MoveableObject extends DrawableObject {
     }
 
     jump() {
-        this.speedY = 30;
+        this.speedY = 25;
     }
 
     playAnimation(images) {

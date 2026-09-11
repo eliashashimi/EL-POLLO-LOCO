@@ -32,42 +32,51 @@ export class Character extends MoveableObject {
 
     animate() {
         IntervalHub.startInterval(() => {
-            if (window.isGamePaused) return;
-            let movingNow = (Keyboard.RIGHT || Keyboard.LEFT) && !this.isDead();
-
-            this.isMoving = movingNow && !this.isAboveGround();
-
-            if (Keyboard.RIGHT && !this.isDead()) {
-                this.moveRight();
-                this.lastMove = new Date().getTime();
+            this.handlePhysics();
+            if (this.slowerAnimation % 4 === 0) {
+                this.handleGraphics();
             }
-            if (Keyboard.LEFT && this.x > 0 && !this.isDead()) {
-                this.x -= this.speed;
-                this.otherDirection = true;
-                this.lastMove = new Date().getTime();
-            }
-
-            if (Keyboard.UP && !this.isAboveGround() && !this.isDead()) {
-                this.jump();
-                this.lastMove = new Date().getTime();
-            }
-
-            // World.camera_x = -this.x + 100;
-        }, 1000 / 60);
-
-        IntervalHub.startInterval(() => {
-            if (window.isGamePaused) return;
-            this.handleSnoringSound();
-            if (this.isDead()) return this.handleDeath();
-            if (this.isHurt() && !this.isImmuneAfterKill) this.playAnimation(ImageHub.PEPE.hurt);
-            if (this.isAboveGround()) this.playAnimation(ImageHub.PEPE.jump);
-            if (this.isMoving) this.playAnimation(ImageHub.PEPE.walk);
-
-            if (this.isSleeping() && this.slowerAnimation % 5 === 0) this.playAnimation(ImageHub.PEPE.longIdle);
-            if (!this.isSleeping() && this.slowerAnimation % 3 === 0) this.playAnimation(ImageHub.PEPE.idle);
-
             this.slowerAnimation++;
-        }, 1000 / 15);
+        }, 1000 / 60);
+    }
+
+    handlePhysics() {
+        if (window.isGamePaused || window.isGameOver) return;
+        this.isMoving = (Keyboard.RIGHT || Keyboard.LEFT) && !this.isDead() && !this.isAboveGround();
+        if (!this.isDead()) this.checkMovementInput();
+    }
+
+    checkMovementInput() {
+        if (Keyboard.RIGHT) {
+            this.moveRight();
+            this.lastMove = new Date().getTime();
+        }
+        if (Keyboard.LEFT && this.x > 0) {
+            this.x -= this.speed;
+            this.otherDirection = true;
+            this.lastMove = new Date().getTime();
+        }
+
+        if (Keyboard.UP && !this.isAboveGround()) {
+            this.jump();
+            this.lastMove = new Date().getTime();
+        }
+    }
+
+    handleGraphics() {
+        if (window.isGamePaused || window.isGameOver) return;
+        this.handleSnoringSound();
+
+        if (this.isDead()) return this.handleDeath();
+        if (this.isHurt() && !this.isImmuneAfterKill) return this.playAnimation(ImageHub.PEPE.hurt);
+        if (this.isAboveGround()) return this.playAnimation(ImageHub.PEPE.jump);
+        if (this.isMoving) return this.playAnimation(ImageHub.PEPE.walk);
+        this.handleAnimations();
+    }
+
+    handleAnimations() {
+        if (this.isSleeping() && this.slowerAnimation % 5 === 0) this.playAnimation(ImageHub.PEPE.longIdle);
+        if (!this.isSleeping() && this.slowerAnimation % 3 === 0) this.playAnimation(ImageHub.PEPE.idle);
     }
 
     handleDeath() {
@@ -81,15 +90,15 @@ export class Character extends MoveableObject {
         }
     }
 
-    handleMovementSound(isMoving) {
-        if (isMoving) {
-            if (AudioHub.PEPE_RUN.file.paused) {
-                AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
-            } else {
-                AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-            }
-        }
-    }
+    // handleMovementSound(isMoving) {
+    //     if (isMoving) {
+    //         if (AudioHub.PEPE_RUN.file.paused) {
+    //             AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
+    //         } else {
+    //             AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
+    //         }
+    //     }
+    // }
 
     handleSnoringSound() {
         if (this.isSleeping() && !this.isDead() && !this.isHurt() && !this.isMoving && !this.isAboveGround()) {
@@ -101,15 +110,10 @@ export class Character extends MoveableObject {
 
     isSleeping() {
         let timePassed = new Date().getTime() - this.lastMove;
-        timePassed = timePassed / 2500;
-        return timePassed > 4;
+        return timePassed > 4000;
     }
 
     bounce() {
         this.speedY = 12;
     }
-
-    // playsound() {
-    //     IntervalHub.startInterval();
-    // }
 }

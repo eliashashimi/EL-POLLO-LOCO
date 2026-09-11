@@ -44,26 +44,9 @@ export class AudioHub extends MyAudio {
             sound.file.currentTime = 0;
         } else if (!sound.file.paused) return;
 
-        sound.file.volume = 0.4;
+        sound.file.volume = sound.file.volume || 0.4;
         sound.file.loop = loop;
         sound.file.play().catch((e) => console.log("Audio verzögert", e));
-
-        // if (sound.file.readyState > 0 || sound.isLoaded) {
-        //     sound.file.volume = 0.4;
-        //     sound.isLoaded = true;
-        //     sound.file.loop = loop;
-        //     sound.file.play().catch((e) => console.log("Audio verzögert (User-Interaktion erforderlich):", e));
-        // } else {
-        //     sound.file.addEventListener(
-        //         "canplay",
-        //         () => {
-        //             sound.file.volume = 0.4;
-        //             sound.file.loop = loop;
-        //             sound.file.play().catch((e) => {});
-        //         },
-        //         { once: true },
-        //     );
-        // }
     }
 
     static STOP_ALL() {
