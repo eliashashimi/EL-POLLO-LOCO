@@ -132,7 +132,11 @@ function startNewGame() {
     hideEndScreens();
     landingPage.classList.add("d-none");
     if (ingameControls) ingameControls.classList.remove("d-none");
-
+    const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const mobileControls = document.getElementById("mobile-contols");
+    if (mobileControls) {
+        isMobile ? mobileControls.classList.remove("d-none") : mobileControls.classList.add("d-none");
+    }
     IntervalHub.stopAllInterval();
     AudioHub.STOP_ALL();
     isPaused = false;
@@ -159,25 +163,10 @@ function bindTouchButton(elementId, keyboardKey) {
         e.preventDefault();
         if (!world || isPaused) return;
         Keyboard[keyboardKey] = true;
-        if (
-            (keyboardKey === "LEFT" || keyboardKey === "RIGHT") &&
-            !world.character.isDead() &&
-            !world.character.isAboveGround() &&
-            AudioHub.PEPE_RUN.file.paused
-        ) {
-            AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
-        }
-        if (keyboardKey === "UP" && !world.character.isDead() && !world.character.isAboveGround()) {
-            AudioHub.PLAY_ONE(AudioHub.PEPE_JUMP);
-            AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-        }
     });
     btn.addEventListener("touchend", (e) => {
         e.preventDefault();
         Keyboard[keyboardKey] = false;
-
-        if (keyboardKey === "LEFT" && !Keyboard.RIGHT) AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-        if (keyboardKey === "RIGHT" && !Keyboard.LEFT) AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
     });
 }
 
