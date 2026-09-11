@@ -78,7 +78,6 @@
     transform: scale(1.2);
 }
 
-/* Der verschiebbare Knopf des Sliders (Firefox) */
 .volume-slider::-moz-range-thumb {
     width: 16px;
     height: 16px;
@@ -258,4 +257,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.touch-btn img {
+    pointer-events: none;
 }

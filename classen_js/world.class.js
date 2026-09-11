@@ -66,7 +66,14 @@ export class World {
     }
 
     checkThrowableObjects() {
-        if (Keyboard.Space && this.bottles > 0 && !this.character.isDead() && !window.isGameOver && !this.isThrowing) {
+        if (
+            Keyboard.Space &&
+            this.bottles > 0 &&
+            !this.character.isDead() &&
+            !window.isGameOver &&
+            !this.isThrowing &&
+            !this.character.isAboveGround()
+        ) {
             this.isThrowing = true;
             const x = this.character.otherDirection ? this.character.x - 10 : this.character.x + 100;
             let bottle = new ThrowableObject(x, this.character.y + 150, this.character.otherDirection);

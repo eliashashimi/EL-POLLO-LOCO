@@ -2,6 +2,7 @@ import { AudioHub } from "./classen_js/audio-hub.class.js";
 import { IntervalHub } from "./classen_js/interval-hub.class.js";
 import { Keyboard } from "./classen_js/keyboard.class.js";
 import { World } from "./classen_js/world.class.js";
+import { instructionsTemp, mobileInstructionsTemp } from "./js/template.js";
 
 let world;
 let canvas;
@@ -30,14 +31,14 @@ const btnInGamePause = document.getElementById("btn-ingame-pause");
 const btnResume = document.getElementById("btn-resume");
 
 function init() {
-    canvas = document.getElementById("canvas");
     hideEndScreens();
     initAudioSettings();
-
     window.isGameOver = false;
+    canvas = document.getElementById("canvas");
     world = new World(canvas);
+
+    checkIsMobile();
 }
-// window.addEventListener("load", init);
 
 function hideEndScreens() {
     if (gameOverScreen) gameOverScreen.classList.add("d-none");
@@ -132,16 +133,33 @@ function startNewGame() {
     hideEndScreens();
     landingPage.classList.add("d-none");
     if (ingameControls) ingameControls.classList.remove("d-none");
-    const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    const mobileControls = document.getElementById("mobile-contols");
-    if (mobileControls) {
-        isMobile ? mobileControls.classList.remove("d-none") : mobileControls.classList.add("d-none");
-    }
     IntervalHub.stopAllInterval();
     AudioHub.STOP_ALL();
     isPaused = false;
     window.isGameOver = false;
     init();
+}
+
+function checkIsMobile() {
+    const isMobile =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.innerWidth <= 1024 ||
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const mobileControls = document.getElementById("mobile-controls");
+    if (mobileControls) {
+        isMobile ? mobileControls.classList.remove("d-none") : mobileControls.classList.add("d-none");
+    }
+}
+
+function updateControlInstructions(isMobile) {
+    const list = document.getElementById("instructions-list");
+    if (!list) return;
+    if (isMobile) {
+        list.innerHTML = mobileInstructionsTemp();
+    } else {
+        list.innerHTML = instructionsTemp();
+    }
 }
 
 document.querySelectorAll(".btn-home").forEach((btn) => {
@@ -274,3 +292,7 @@ window.addEventListener("keyup", (e) => {
 document.querySelectorAll(".btn-restart").forEach((btn) => {
     btn.addEventListener("click", startNewGame);
 });
+
+const isMobileDevice =
+    "ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 1024 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+updateControlInstructions(isMobileDevice);

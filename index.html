@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="./css_styles/end-page.css" />
         <link rel="stylesheet" href="./css_styles/standard.css" />
         <link rel="stylesheet" href="style.css" />
+        <script type="module" src="./js/template.js" defer></script>
         <script type="module" src="levels/level1.js" defer></script>
         <script type="module" src="game.js" defer></script>
         <title>EL POLLO LOCO</title>
@@ -85,12 +86,7 @@
             <div id="howto-screen" class="howto-screen d-none">
                 <div class="menu-content settings-box">
                     <h2>Spielanleitung</h2>
-                    <div class="instructions">
-                        <p><strong>Links</strong><img src="./assets/icons/arrow-left-square.svg" alt="Pfeiltaste Links" /></p>
-                        <p><strong>Rechts</strong><img src="./assets/icons/arrow-right-square.svg" alt="Pfeiltaste Rechts" /></p>
-                        <p><strong>Sprung</strong><img src="./assets/icons/arrow-up-square.svg" alt="Pfeiltaste Oben" /></p>
-                        <p><strong>Werfen</strong><img src="./assets/icons/spacebar-svgrepo-com.svg" alt="Space Taste" /></p>
-                    </div>
+                    <div id="instructions-list" class="instructions"></div>
                     <button id="btn-howto-back" class="btn-howto-back">Zurück</button>
                 </div>
             </div>
