@@ -150,11 +150,11 @@
 
 .btn-start {
     color: transparent;
-    font-size: clamp(16px, 2.5vw, 24px);
+    font-size: clamp(12px, 2.5vw, 24px);
     width: fit-content;
     min-width: 0;
     max-width: 100%;
-    padding: 8px 24px;
+    padding: clamp(5px, 1.5vw, 8px) clamp(12px, 4vw, 24px);
     border-color: #d32f2f;
     background:
         linear-gradient(to bottom, #d32f2f, #ffeb3b) text,
