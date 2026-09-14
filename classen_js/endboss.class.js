@@ -52,57 +52,58 @@ export class Endboss extends MoveableObject {
         setTimeout(() => {
             if (window.isGamePaused) return setTimeout(() => this.HurtAndAttackSequence(), 100);
             this.isHurted = false;
-
-            if (!this.isDead()) {
-                this.isAttacking = true;
-                this.speed = 4.5;
-                this.currentImage = 0;
-
-                setTimeout(() => {
-                    this.isAttacking = false;
-                    this.speed = 2.5;
-                }, 2500);
-            }
+            if (!this.isDead()) this.startAttackSequence();
         }, 400);
+    }
+
+    startAttackSequence() {
+        this.isAttacking = true;
+        this.speed = 4.5;
+        this.currentImage = 0;
+        setTimeout(() => this.stopAttackSequence(), 2500);
+    }
+
+    stopAttackSequence() {
+        this.isAttacking = false;
+        this.speed = 2.5;
     }
 
     animate() {
         IntervalHub.startInterval(() => {
             if (window.isGamePaused) return;
-            if (this.isDead()) {
-                this.playAnimation(ImageHub.ENDBOSS.dead);
-            } else if (this.isHurted) {
-                this.playAnimation(ImageHub.ENDBOSS.hurt);
-            } else if (this.isAttacking) {
-                this.playAnimation(ImageHub.ENDBOSS.attack);
-            } else if (this.isAlerting) {
-                this.playAnimation(ImageHub.ENDBOSS.alert);
-            } else {
-                this.playAnimation(ImageHub.ENDBOSS.walk);
-            }
+            this.playCurrentAnimation();
         }, 1000 / 5);
 
         this.firstHitWalking();
     }
 
-    firstHitWalking() {
-        IntervalHub.startInterval(() => {
-            if (window.isGamePaused || this.isDead() || !this.world || !this.world.character) return;
-            let cameraRightEdge = -World.camera_x + 960;
+    playCurrentAnimation() {
+        if (this.isDead()) return this.playAnimation(ImageHub.ENDBOSS.dead);
+        if (this.isHurted) return this.playAnimation(ImageHub.ENDBOSS.hurt);
+        if (this.isAttacking) return this.playAnimation(ImageHub.ENDBOSS.attack);
+        if (this.isAlerting) return this.playAnimation(ImageHub.ENDBOSS.alert);
+        this.playAnimation(ImageHub.ENDBOSS.walk);
+    }
 
-            if (!this.hadfirstSight && this.x < cameraRightEdge) {
-                this.hadfirstSight = true;
-                this.isAlerting = true;
-                this.speed = 0;
-                setTimeout(() => {
-                    this.isAlerting = false;
-                    this.speed = 2.5;
-                }, 1500);
-            }
-            if (this.hadfirstSight && !this.isAlerting && !this.isHurted) {
-                this.followCaracter();
-            }
-        }, 1000 / 60);
+    firstHitWalking() {
+        IntervalHub.startInterval(() => this.updateFirstHitWalking(), 1000 / 60);
+    }
+
+    updateFirstHitWalking() {
+        if (window.isGamePaused || this.isDead() || !this.world || !this.world.character) return;
+        let cameraRightEdge = -World.camera_x + 960;
+        if (!this.hadfirstSight && this.x < cameraRightEdge) this.triggerFirstSight();
+        if (this.hadfirstSight && !this.isAlerting && !this.isHurted) this.followCaracter();
+    }
+
+    triggerFirstSight() {
+        this.hadfirstSight = true;
+        this.isAlerting = true;
+        this.speed = 0;
+        setTimeout(() => {
+            this.isAlerting = false;
+            this.speed = 2.5;
+        }, 1500);
     }
 
     followCaracter() {

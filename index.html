@@ -2,7 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        <link rel="stylesheet" href="./css_styles/fonts.css"/>
+        <link rel="stylesheet" href="./css_styles/mobile.css" />
         <link rel="stylesheet" href="./css_styles/btn.css" />
         <link rel="stylesheet" href="./css_styles/end-page.css" />
         <link rel="stylesheet" href="./css_styles/standard.css" />
@@ -34,25 +36,25 @@
 
             <div id="mobile-controls" class="mobile-controls d-none">
                 <div class="joystick-left">
-                    <button id="touch-left" class="touch-btn">
+                    <button id="touch-left" class="touch-btn big-btn">
                         <img src="./assets/icons/chevron-double-left.svg" alt="Touch Button links" />
                     </button>
-                    <button id="touch-right" class="touch-btn">
+                    <button id="touch-right" class="touch-btn big-btn">
                         <img src="./assets/icons/chevron-double-right.svg" alt="Touch Button rechts" />
                     </button>
                 </div>
-                <div id="joystick-right">
-                    <button id="touch-jump" class="touch-btn action-btn">
+                <div class="joystick-right">
+                    <button id="touch-jump" class="touch-btn big-btn">
                         <img src="./assets/icons/chevron-double-up.svg" alt="Touch Button Sprung" />
                     </button>
-                    <button id="touch-throw" class="touch-btn action-btn">
-                        <img src="./assets/icons/clipart1871127.png" alt="Touch Button Flasche werfen" />
+                    <button id="touch-throw" class="touch-btn action-btn throw-spacing">
+                        <img src="./assets/icons/clipart1871127.png" alt="Touch Button Flasche werfen" class="salsa-bottle" />
                     </button>
                 </div>
             </div>
 
             <div id="landing-page" class="landing-page">
-                <img src="assets/img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen EL POLLO LOCO" class="bg-img" />
+                <img src="assets/img/9_intro_outro_screens/start/startscreen_2.png" alt="Start Screen EL POLLO LOCO" class="bg-img-landing" />
                 <div class="menu-content">
                     <button id="btn-start" class="btn-start">Spiel starten</button>
                     <div class="right-buttons">
@@ -78,8 +80,32 @@
                     </div>
                     <div class="settings-row border-top">
                         <button id="btn-howto" class="menu-btn">Spielanleitung</button>
+                        <button id="btn-impressum" class="menu-btn btn-impressum">Impressum</button>
                         <button id="btn-settings-back" class="menu-btn btn-settings-back">Zurück</button>
                     </div>
+                </div>
+            </div>
+
+            <div id="impressum-screen" class="impressum-screen d-none">
+                <div class="menu-content settings-box">
+                    <h2>Impressum & Rechtliches</h2>
+                    <div class="Impressum-content-text">
+                        <p><strong>Entwickler: </strong>M. Elias Hashimi</p>
+                        <p><strong>Adresse</strong>
+                        <p>Mustermann Straße 7</p>
+                        <p>12345 Muster</p>
+                        </p>
+                        <p>&copy; 2026 Alle Rechte vorbehalten.</p>
+                        <p class="impressum-row">
+                            <strong>Github</strong>
+                            <a href="https://github.com/eliashashimi" target="_blank" class="legal-link">">🐱 eliashashimi</a>
+                        </p>
+                        <p class="impressum-row">
+                            <strong>Kontakt / Support:</strong>
+                            elias.h.989@hotmail.com
+                        </p>
+                    </div>
+                    <button id="btn-impressum-back" class="btn-impressum-back">Zurück</button>
                 </div>
             </div>
 
@@ -114,10 +140,5 @@
                 </div>
             </div>
         </section>
-        <footer id="footer" class="footer">
-            <p>&copy; 2026 M. Elias Hashimi |</p>
-            <a href="https://github.com/eliashashimi" target="_blank">GitHub Profil</a>
-            <a href="">Impressum</a>
-        </footer>
     </body>
 </html>

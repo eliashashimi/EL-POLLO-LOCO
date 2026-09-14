@@ -46,7 +46,7 @@ export class AudioHub extends MyAudio {
 
         sound.file.volume = sound.file.volume || 0.4;
         sound.file.loop = loop;
-        sound.file.play().catch((e) => console.log("Audio verzögert", e));
+        sound.file.play().catch(() => {});
     }
 
     static STOP_ALL() {

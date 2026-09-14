@@ -23,12 +23,15 @@ const btnMute = document.getElementById("btn-mute");
 const btnHowTo = document.getElementById("btn-howto");
 const btnSettingsBack = document.getElementById("btn-settings-back");
 const btnHowToBack = document.getElementById("btn-howto-back");
-
+const btnImpressum = document.getElementById("btn-impressum");
+const btnImpressumBack = document.getElementById("btn-impressum-back");
+const impressumScreen = document.getElementById("impressum-screen");
 const pauseScreen = document.getElementById("pause-screen");
 const ingameControls = document.getElementById("ingame-controls");
 const btnInGameMute = document.getElementById("btn-ingame-mute");
 const btnInGamePause = document.getElementById("btn-ingame-pause");
 const btnResume = document.getElementById("btn-resume");
+window.isPepeRunningSoundPlaying = false;
 
 function init() {
     hideEndScreens();
@@ -36,8 +39,35 @@ function init() {
     window.isGameOver = false;
     canvas = document.getElementById("canvas");
     world = new World(canvas);
+    zoomLock();
+}
 
-    checkIsMobile();
+function zoomLock() {
+    preventMultiTouchZoom();
+    preventDoubleTapZoom();
+}
+
+function preventMultiTouchZoom() {
+    document.addEventListener(
+        "touchstart",
+        (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        },
+        { passive: false },
+    );
+}
+
+function preventDoubleTapZoom() {
+    let lastTouchEnd = 0;
+    document.addEventListener(
+        "touchend",
+        (e) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        },
+        { passive: false },
+    );
 }
 
 function hideEndScreens() {
@@ -58,17 +88,23 @@ function initAudioSettings() {
 }
 
 function updateMuteButtonUI() {
-    const mainMuteIcon = btnMute ? btnMute.querySelector("img") : null;
-    const ingameMuteIcon = btnInGameMute ? btnInGameMute.querySelector("img") : null;
+    updateMuteAudio();
+    updateMuteIcons();
+}
 
-    const iconSrc = AudioHub.IS_MUTED ? "./assets/icons/volume-mute.svg" : "./assets/icons/volume-up.svg";
-    const altText = AudioHub.IS_MUTED ? "Ton-Aus" : "Ton-An";
-
+function updateMuteAudio() {
     if (AudioHub.IS_MUTED) {
         AudioHub.STOP_ALL();
     } else if (world && !isPaused) {
         AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
     }
+}
+
+function updateMuteIcons() {
+    const mainMuteIcon = btnMute ? btnMute.querySelector("img") : null;
+    const ingameMuteIcon = btnInGameMute ? btnInGameMute.querySelector("img") : null;
+    const iconSrc = AudioHub.IS_MUTED ? "./assets/icons/volume-mute.svg" : "./assets/icons/volume-up.svg";
+    const altText = AudioHub.IS_MUTED ? "Ton-Aus" : "Ton-An";
     if (mainMuteIcon) {
         mainMuteIcon.src = iconSrc;
         mainMuteIcon.alt = altText;
@@ -113,9 +149,7 @@ if (btnGraphics) {
 function togglePause() {
     if (!world) return;
     isPaused = !isPaused;
-
     window.isGamePaused = isPaused;
-
     if (isPaused) {
         AudioHub.STOP_ALL();
         if (pauseScreen) pauseScreen.classList.remove("d-none");
@@ -130,9 +164,11 @@ if (btnStart) {
 }
 
 function startNewGame() {
+    window.scrollTo(0, 1);
     hideEndScreens();
     landingPage.classList.add("d-none");
     if (ingameControls) ingameControls.classList.remove("d-none");
+    checkIsMobile();
     IntervalHub.stopAllInterval();
     AudioHub.STOP_ALL();
     isPaused = false;
@@ -145,10 +181,11 @@ function checkIsMobile() {
         "ontouchstart" in window ||
         navigator.maxTouchPoints > 0 ||
         window.innerWidth <= 1024 ||
+        window.matchMedia("(pointer: coarse)").matches ||
         /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const mobileControls = document.getElementById("mobile-controls");
-    if (mobileControls) {
-        isMobile ? mobileControls.classList.remove("d-none") : mobileControls.classList.add("d-none");
+    const controls = document.getElementById("mobile-controls");
+    if (controls) {
+        !isMobile || window.isGameOver ? controls.classList.add("d-none") : controls.classList.remove("d-none");
     }
 }
 
@@ -177,14 +214,28 @@ if (btnInGameMute) btnInGameMute.addEventListener("click", toggleMute);
 function bindTouchButton(elementId, keyboardKey) {
     const btn = document.getElementById(elementId);
     if (!btn) return;
+    bindTouchStart(btn, keyboardKey);
+    bindTouchEnd(btn, keyboardKey);
+}
+
+function bindTouchStart(btn, keyboardKey) {
     btn.addEventListener("touchstart", (e) => {
         e.preventDefault();
-        if (!world || isPaused) return;
+        if (!world || isPaused || window.isGameOver) return;
         Keyboard[keyboardKey] = true;
+        if ((keyboardKey === "LEFT" || keyboardKey === "RIGHT") && !isPepeRunningSoundPlaying) {
+            isPepeRunningSoundPlaying = true;
+        }
     });
+}
+
+function bindTouchEnd(btn, keyboardKey) {
     btn.addEventListener("touchend", (e) => {
         e.preventDefault();
         Keyboard[keyboardKey] = false;
+        if (keyboardKey === "LEFT" || keyboardKey === "RIGHT") {
+            isPepeRunningSoundPlaying = false;
+        }
     });
 }
 
@@ -218,6 +269,9 @@ window.showGameOver = function () {
     AudioHub.PLAY_ONE(AudioHub.PEPE_DEAD);
     IntervalHub.stopAllInterval();
     if (gameOverScreen) gameOverScreen.classList.remove("d-none");
+    const controls = document.getElementById("mobile-controls");
+    if (controls) controls.classList.add("d-none");
+    checkIsMobile();
 };
 
 window.showGameWin = function () {
@@ -225,6 +279,9 @@ window.showGameWin = function () {
     AudioHub.STOP_ALL();
     IntervalHub.stopAllInterval();
     if (gameWinScreen) gameWinScreen.classList.remove("d-none");
+    const controls = document.getElementById("mobile-controls");
+    if (controls) controls.classList.add("d-none");
+    checkIsMobile();
 };
 
 btnSettings.addEventListener("click", () => {
@@ -247,44 +304,34 @@ btnHowToBack.addEventListener("click", () => {
     settingsScreen.classList.remove("d-none");
 });
 
+if (btnImpressum && impressumScreen && settingsScreen) {
+    btnImpressum.addEventListener("click", () => {
+        settingsScreen.classList.add("d-none");
+        impressumScreen.classList.remove("d-none");
+    });
+}
+
+if (btnImpressumBack && impressumScreen && settingsScreen) {
+    btnImpressumBack.addEventListener("click", () => {
+        impressumScreen.classList.add("d-none");
+        settingsScreen.classList.remove("d-none");
+    });
+}
+
 btnMute.addEventListener("click", toggleMute);
 
 window.addEventListener("keydown", (e) => {
     if (!world || isPaused) return;
-
-    if (e.code == "ArrowRight") {
-        Keyboard.RIGHT = true;
-        if (world.character && !world.character.isDead() && !world.character.isAboveGround() && AudioHub.PEPE_RUN.file.paused) {
-            AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
-        }
-    }
-    if (e.code == "ArrowLeft") {
-        Keyboard.LEFT = true;
-        if (world.character && !world.character.isDead() && !world.character.isAboveGround() && AudioHub.PEPE_RUN.file.paused) {
-            AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
-        }
-    }
-    if (e.code == "ArrowUp") {
-        Keyboard.UP = true;
-        if (world.character && !world.character.isDead() && !world.character.isAboveGround()) {
-            AudioHub.PLAY_ONE(AudioHub.PEPE_JUMP);
-            AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-        }
-    }
+    if (e.code == "ArrowRight") Keyboard.RIGHT = true;
+    if (e.code == "ArrowLeft") Keyboard.LEFT = true;
+    if (e.code == "ArrowUp") Keyboard.UP = true;
     if (e.code == "Space") Keyboard.Space = true;
 });
 
 window.addEventListener("keyup", (e) => {
     if (!world) return;
-
-    if (e.code == "ArrowRight") {
-        Keyboard.RIGHT = false;
-        if (!Keyboard.LEFT) AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-    }
-    if (e.code == "ArrowLeft") {
-        Keyboard.LEFT = false;
-        if (!Keyboard.RIGHT) AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-    }
+    if (e.code == "ArrowRight") Keyboard.RIGHT = false;
+    if (e.code == "ArrowLeft") Keyboard.LEFT = false;
     if (e.code == "ArrowUp") Keyboard.UP = false;
     if (e.code == "Space") Keyboard.Space = false;
 });

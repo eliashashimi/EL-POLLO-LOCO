@@ -1,52 +1,220 @@
-.settings-box {
-    background: rgba(15, 15, 15, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 35px 45px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+.settings-box,
+.howto-screen .settings-box,
+.settings-screen .settings-box,
+.impressum-screen .settings-box {
+    width: 85%;
+    max-width: 500px;
+    max-height: 85%;
+    min-width: 0;
+    padding: 4% 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 3%;
+    overflow-y: auto;
     color: #f0f0f0;
+    font-family: "Spicy Rice", "Ewert", serif;
+    background: rgba(45, 45, 45, 0.75);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
     box-shadow:
         0 25px 60px rgba(0, 0, 0, 0.7),
         inset 0 0 20px rgba(255, 255, 255, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 380px;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.settings-box h2 {
+    margin: 0 0 15px;
+    color: #ffd54f;
+    font-size: clamp(18px, 4.5vw, 26px);
+    text-align: center;
+    text-shadow: 2px 2px 0 #4a2306;
 }
 
 .settings-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 20px;
     width: 100%;
 }
 
-.settings-row label {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: #e0e0e0;
+.settings-box .settings-row + .settings-row {
+    margin-top: 10px;
+}
+
+.settings-row label,
+.instructions p,
+.impressum-row {
+    color: #f5f5f5;
+    font-family: "Spicy Rice", "Ewert", serif;
+    font-size: clamp(11px, 1.6vw, 15px);
+    font-weight: 400;
 }
 
 .border-top {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 20px;
-    flex-direction: column; /* Buttons untereinander */
+    flex-direction: column;
     gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Der Toggle-Button für die Grafik */
+.menu-btn,
+.btn-start,
+.btn-settings,
+.btn-mute,
+.btn-impressum,
+.btn-settings-back,
+.btn-howto-back,
+.btn-impressum-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    color: #ffd54f;
+    font-family: "Spicy Rice", "Ewert", serif;
+    font-size: clamp(11px, 1.6vw, 15px);
+    font-weight: 300;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    transition:
+        transform 0.15s ease-in-out,
+        background 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+}
+
+.menu-btn,
+.btn-start,
+.btn-settings-back,
+.btn-howto-back,
+.btn-impressum-back {
+    min-width: 60%;
+    max-width: 260px;
+    padding: 1.5% 4%;
+}
+
+.game-pause .menu-btn,
+.game-pause .btn-howto-back,
+.game-pause .btn-impressum-back {
+    min-width: 100%;
+    max-width: none;
+}
+
+.settings-box .menu-btn,
+.btn-settings-back,
+.btn-howto-back,
+.btn-impressum-back {
+    width: fit-content;
+    align-self: center;
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 6px 20px;
+    line-height: 1.2;
+}
+
+.menu-btn:hover,
+.btn-start:hover,
+.btn-settings:hover,
+.btn-mute:hover,
+.btn-impressum:hover,
+.btn-settings-back:hover,
+.btn-howto-back:hover,
+.btn-impressum-back:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.menu-btn:active,
+.btn-start:active,
+.btn-settings:active,
+.btn-mute:active,
+.btn-impressum:active,
+.btn-settings-back:active,
+.btn-howto-back:active,
+.btn-impressum-back:active {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px);
+}
+
+.btn-start {
+    color: transparent;
+    font-size: clamp(16px, 2.5vw, 24px);
+    width: fit-content;
+    min-width: 0;
+    max-width: 100%;
+    padding: 8px 24px;
+    border-color: #d32f2f;
+    background:
+        linear-gradient(to bottom, #d32f2f, #ffeb3b) text,
+        rgba(255, 255, 255, 0.1) border-box;
+    background-clip: text, border-box;
+    -webkit-background-clip: text, border-box;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 0 rgba(74, 35, 6, 0.65);
+}
+
+.btn-start:hover {
+    background:
+        linear-gradient(to bottom, #d32f2f, #ffeb3b) text,
+        rgba(255, 255, 255, 0.25) border-box;
+    background-clip: text, border-box;
+    -webkit-background-clip: text, border-box;
+    border-color: #ffeb3b;
+}
+
+.btn-settings,
+.btn-mute {
+    width: clamp(32px, 7vw, 50px);
+    min-width: 0;
+    height: clamp(32px, 7vw, 50px);
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.btn-settings img,
+.btn-mute img {
+    width: 60%;
+    height: 60%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.btn-settings:hover,
+.btn-mute:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-settings:active,
+.btn-mute:active {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px);
+}
+
 .setting-toggle-btn {
-    min-width: 160px !important;
-    padding: 8px 15px !important;
-    font-size: 14px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    min-width: 140px;
+    padding: 8px 15px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-/* --- DESIGN DES LAUTSTÄRKE-SLIDERS --- */
 .slider-container {
     display: flex;
     align-items: center;
@@ -54,211 +222,145 @@
 }
 
 .volume-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 130px;
+    width: clamp(80px, 15vw, 130px);
     height: 6px;
+    appearance: none;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
     outline: none;
 }
 
 .volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
     width: 16px;
     height: 16px;
-    border-radius: 50%;
+    appearance: none;
     background: #ffffff;
+    border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    transition: transform 0.1s;
-}
-.volume-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
 }
 
 .volume-slider::-moz-range-thumb {
     width: 16px;
     height: 16px;
     border: none;
-    border-radius: 50%;
     background: #ffffff;
+    border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    transition: transform 0.1s;
-}
-.volume-slider::-moz-range-thumb:hover {
-    transform: scale(1.2);
 }
 
 #volume-value {
-    font-size: 14px;
-    font-weight: bold;
     min-width: 35px;
-    text-align: right;
     color: #b0b0b0;
-}
-
-.settings-box h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 26px;
-    text-align: center;
-}
-
-.settings-screen,
-.howto-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 960px;
-    height: 540px;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.5);
-}
-
-.settings-box .menu-btn {
-    min-width: 220px;
-}
-
-.menu-btn,
-.btn-start,
-.btn-settings,
-.btn-mute,
-.btn-howTo,
-.btn-settings-back,
-.btn-howTo-back {
-    font-family: "Arial", sans-serif;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: bold;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+    text-align: right;
 }
 
-.menu-btn:hover,
-.btn-start:hover,
-.btn-howTo:hover,
-.btn-settings-back:hover,
-.btn-howTo-back:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.6);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.menu-btn:active,
-.btn-start:active,
-.btn-howTo:active,
-.btn-settings-back:active,
-.btn-howTo-back:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.btn-start {
-    padding: 14px 35px;
-    min-width: 180px;
-}
-
-.btn-settings,
-.btn-mute {
-    min-width: 50px !important;
-    width: 50px;
-    height: 50px;
-    padding: 0;
-}
-
-.btn-settings img,
-.btn-mute img {
-    width: 32px;
-    height: 32px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.instructions {
-    text-align: left;
-    line-height: 1.8;
+.instructions,
+.impressum-content-text,
+.Impressum-content-text {
     margin-bottom: 15px;
+    color: #ffffff;
+    line-height: 1.8;
+    text-align: left;
 }
 
-.instructions p {
+.instructions p,
+.impressum-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 40px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 6px;
     margin: 8px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.impressum-row a {
+    color: #ff9800;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.impressum-row a:hover {
+    color: #ff5722;
 }
 
 .instructions img {
     width: 32px;
     height: 32px;
+    filter: invert(100%) brightness(200%);
+}
+
+.instructions img[src*="clipart"] {
+    width: auto;
+    object-fit: contain;
+    filter: hue-rotate(140deg) saturate(8) brightness(1.1);
 }
 
 .ingame-controls {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: clamp(8px, 2.5vw, 15px);
+    right: clamp(8px, 2.5vw, 15px);
     z-index: 5;
     display: flex;
-    gap: 10px;
+    gap: clamp(6px, 1.5vw, 10px);
 }
 
 .circle-btn {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(30px, 6vw, 45px);
+    height: clamp(30px, 6vw, 45px);
+    color: #ffffff;
+    font-size: clamp(12px, 2.5vw, 18px);
     background: rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    font-size: 18px;
+    border-radius: 50%;
     cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     backdrop-filter: blur(4px);
-    transition: transform 0.1s;
+    transition:
+        transform 0.1s,
+        background 0.1s;
 }
+
 .circle-btn:hover {
-    transform: scale(1.1);
     background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
 }
+
 .circle-btn img {
-    width: 22px;
-    height: 22px;
+    width: 50%;
+    height: 50%;
+}
+
+.settings-screen,
+.howto-screen,
+.impressum-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .game-pause {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
-    z-index: 9;
     background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.touch-btn img {
-    pointer-events: none;
 }

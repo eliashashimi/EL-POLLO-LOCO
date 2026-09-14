@@ -8,7 +8,7 @@ export class MoveableObject extends DrawableObject {
     energy = 100;
     addCoin = 0;
     addBottle = 0;
-    lastHit = new Date().getTime();
+    lastHit = -1;
     isDeadEnemy = false;
     movementInterval;
     amount;

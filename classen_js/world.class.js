@@ -30,17 +30,13 @@ export class World {
     throwableObjects = [];
     isThrowing = false;
     maxWitdh;
-    maxEnd;
     maxCameraPos;
 
     constructor(canvas) {
-        console.log("World erstellt");
-
         this.ctx = canvas.getContext("2d");
         World.canvas = canvas;
         this.level = addLevel1();
         this.character = new Character(this);
-        // this.chickens = this.level.chickens;
         this.endboss = this.level.endboss;
         if (this.endboss) this.endboss.world = this;
         this.maxWidth = this.level.step + World.canvas.width;
@@ -61,27 +57,33 @@ export class World {
         setInterval(() => {
             if (window.isGamePaused) return;
             this.checkThrowableObjects();
-            // console.log(this.level.chickens);
         }, 1000 / 5);
     }
 
     checkThrowableObjects() {
-        if (
+        if (!this.canThrowBottle()) return;
+        this.throwBottle();
+    }
+
+    canThrowBottle() {
+        return (
             Keyboard.Space &&
             this.bottles > 0 &&
             !this.character.isDead() &&
             !window.isGameOver &&
             !this.isThrowing &&
             !this.character.isAboveGround()
-        ) {
-            this.isThrowing = true;
-            const x = this.character.otherDirection ? this.character.x - 10 : this.character.x + 100;
-            let bottle = new ThrowableObject(x, this.character.y + 150, this.character.otherDirection);
-            this.throwableObjects.push(bottle);
-            this.character.lastMove = new Date().getTime();
-            this.bottles--;
-            this.statusbarBottles.setPercentage(this.bottles * 20);
-        }
+        );
+    }
+
+    throwBottle() {
+        this.isThrowing = true;
+        const x = this.character.otherDirection ? this.character.x - 10 : this.character.x + 100;
+        const bottle = new ThrowableObject(x, this.character.y + 150, this.character.otherDirection);
+        this.throwableObjects.push(bottle);
+        this.character.lastMove = new Date().getTime();
+        this.bottles--;
+        this.statusbarBottles.setPercentage(this.bottles * 10);
     }
 
     checkCollisions() {
@@ -220,18 +222,22 @@ export class World {
         if (this.character) World.camera_x = -this.character.x + 100;
         if (World.camera_x > 0) World.camera_x = 0;
         if (World.camera_x < this.maxCameraPos) World.camera_x = this.maxCameraPos;
+        this.drawWorld();
+        this.drawStatusbars();
+        requestAnimationFrame(() => this.draw());
+    }
 
+    drawWorld() {
         this.ctx.translate(World.camera_x, 0);
         this.drawObjects();
-        this.drawFrames();
-        // this.drawOffsetFrames();
         this.ctx.translate(-World.camera_x, 0);
+    }
+
+    drawStatusbars() {
         this.addToMap(this.statusbarHealth);
         this.addToMap(this.statusbarCoins);
         this.addToMap(this.statusbarBottles);
         this.addToMap(this.statusbarEndboss);
-
-        requestAnimationFrame(() => this.draw());
     }
 
     setRealFrames() {
@@ -279,8 +285,21 @@ export class World {
             this.flipImage(mo);
         }
         mo.draw(this.ctx);
+        this.drawObjectFrames(mo);
+        if (mo.otherDirection) {
+            this.flipImageBack(mo);
+        }
+    }
 
-        if (
+    drawObjectFrames(mo) {
+        if (!this.hasRealFrame(mo)) return;
+        mo.drawFrame(this.ctx);
+        mo.getRealFrame();
+        mo.drawRealFrame(this.ctx);
+    }
+
+    hasRealFrame(mo) {
+        return (
             mo instanceof Character ||
             mo instanceof Chicken ||
             mo instanceof SmallChicken ||
@@ -288,15 +307,7 @@ export class World {
             mo instanceof CollectableCoins ||
             mo instanceof CollectableBottles ||
             mo instanceof ThrowableObject
-        ) {
-            mo.drawFrame(this.ctx);
-            mo.getRealFrame();
-            mo.drawRealFrame(this.ctx);
-        }
-
-        if (mo.otherDirection) {
-            this.flipImageBack(mo);
-        }
+        );
     }
 
     flipImage(mo) {

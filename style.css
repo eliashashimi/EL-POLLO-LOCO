@@ -1,20 +1,26 @@
 body {
+    font-family: "Spicy Rice", "Ewert", serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    width: 100%;
+    min-width: 300px;
+    min-height: 100svh;
     padding: 10px;
-    background-color: #e67e22;
-    /* background-image: url("https://vecteezy.com"); */
+    background-color: #d89042;
+    background-image: linear-gradient(rgba(25, 32, 35, 0.22), rgba(74, 35, 6, 0.34)), url("assets/img/5_background/first_half_background.png");
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
+    animation: desert-drift 20s ease-in-out infinite alternate;
+    overflow: hidden;
 }
 
 header h1 {
-    font-family: "Arial Black", "Impact", sans-serif;
-    font-size: 55px;
+    font-family: "Spicy Rice", "Ewert", serif;
+    font-size: clamp(24px, 5.5vw, 55px);
     font-weight: 900;
     text-transform: uppercase;
     margin: 0 0 20px 0;
@@ -25,42 +31,96 @@ header h1 {
     filter: drop-shadow(4px 4px 0px #4a2306);
     letter-spacing: 3px;
     transform: rotate(-2deg);
+    text-align: center;
 }
 
 canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.game-screen {
-    position: relative;
-    width: 960px;
-    height: 540px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-    border: 6px solid #4a2306;
-    border-radius: 12px;
-    background-color: #000;
-    overflow: hidden;
-}
-
-.landing-page {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.game-screen {
+    width: 90%;
+    max-width: 960px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    border: 6px solid #4a2306;
+    border-radius: 12px;
+    background-color: transparent;
+    margin: 4dvh auto;
+}
+
+#game-screen .landing-page,
+#game-screen .game-pause,
+#game-screen .settings-screen,
+#game-screen .howto-screen,
+#game-screen .impressum-screen,
+#game-screen .game-over,
+#game-screen .game-win {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
     z-index: 10;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bg-img-landing {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    animation: landing-pan 16s ease-in-out infinite alternate;
+    transform-origin: center center;
+}
+
+.landing-page::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    content: "";
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 18% 20%, rgba(255, 235, 59, 0.18), transparent 24%),
+        linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.12), transparent 58%);
+    background-size:
+        100% 100%,
+        220% 100%;
+    background-position:
+        center,
+        -120% 0;
+    background-repeat: no-repeat;
+    animation: landing-light 12s ease-in-out infinite;
 }
 
 .bg-img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
+}
+
+.game-over .bg-img,
+.game-win .bg-img {
+    object-fit: contain;
 }
 
 .menu-content {
@@ -88,32 +148,46 @@ canvas {
 }
 
 .d-none {
+    display: none;
+}
+
+#game-screen .d-none {
     display: none !important;
 }
 
 .rotate-screen {
-    position: absolute;
+    display: none;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: #2c1409;
-    z-index: 999;
-    display: none; /* Wird via CSS Media-Query bei Bedarf auf flex geschaltet */
+    width: 100svw;
+    height: 100svh;
+    background-color: rgba(20, 10, 5, 0.95);
+    z-index: 99999;
     justify-content: center;
     align-items: center;
-    color: white;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    box-sizing: border-box;
+}
+
+@media (pointer: coarse) and (orientation: portrait) {
+    .rotate-screen {
+        display: flex;
+    }
+}
+
+.rotate-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .rotate-message p {
-    font-size: 20px;
+    width: 80%;
+    font-size: clamp(20px, 5vw, 32px);
     font-weight: bold;
     margin-top: 15px;
     color: #ffd54f;
+    text-align: center;
 }
 .phone-icon {
     font-size: 50px;
@@ -132,9 +206,64 @@ canvas {
     }
 }
 
-/* Wenn das Display hochkant steht (Breite geringer als Höhe), blende die Sperre ein */
-@media (max-aspect-ratio: 1/1) and (max-width: 1024px) {
-    .rotate-screen {
-        display: flex !important;
+@keyframes desert-drift {
+    0% {
+        background-position: 48% 50%;
+    }
+
+    100% {
+        background-position: 54% 48%;
+    }
+}
+
+@keyframes landing-pan {
+    0% {
+        transform: scale(1.03) translate3d(-0.5%, 0, 0);
+    }
+
+    100% {
+        transform: scale(1.08) translate3d(0.5%, -0.5%, 0);
+    }
+}
+
+@keyframes landing-light {
+    0%,
+    100% {
+        background-position:
+            center,
+            -120% 0;
+        opacity: 0.35;
+    }
+
+    50% {
+        background-position:
+            center,
+            120% 0;
+        opacity: 0.75;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body,
+    .bg-img-landing,
+    .landing-page::after {
+        animation: none;
+    }
+}
+
+@media (pointer: coarse) {
+    body {
+        padding: 0;
+    }
+
+    .game-screen {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: min(100svw, calc((100svh - 16px) * 16 / 9));
+        height: min(56.25svw, calc(100svh - 16px));
+        margin: 0;
+        transform: translate(-50%, -50%);
+        aspect-ratio: 16 / 9;
     }
 }

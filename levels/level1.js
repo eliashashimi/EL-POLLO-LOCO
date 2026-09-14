@@ -6,73 +6,39 @@ import { Level } from "../classen_js/level.class.js";
 import { SmallChicken } from "../classen_js/small-chicken.class.js";
 
 export function addLevel1() {
-    return new Level(
-        8,
-        [
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new SmallChicken(),
-            new SmallChicken(),
-            new SmallChicken(),
-            new SmallChicken(),
-            new SmallChicken(),
-            new SmallChicken(),
-            new SmallChicken(),
-        ],
-        new Endboss(),
-        [
-            new CollectableCoins(400, 230),
-            new CollectableCoins(450, 150),
-            new CollectableCoins(500, 90),
-            new CollectableCoins(550, 150),
-            new CollectableCoins(600, 230),
+    return new Level(8, createChickens(), new Endboss(), createCoins(), createBottles());
+}
 
-            new CollectableCoins(850, 100),
-            new CollectableCoins(900, 100),
-            new CollectableCoins(950, 100),
-            new CollectableCoins(1000, 100),
-            new CollectableCoins(1050, 100),
+function createChickens() {
+    return [...Array.from({ length: 7 }, () => new Chicken()), ...Array.from({ length: 7 }, () => new SmallChicken())];
+}
 
-            new CollectableCoins(1350, 250),
-            new CollectableCoins(1400, 250),
-            new CollectableCoins(1450, 250),
-            new CollectableCoins(1500, 250),
-            new CollectableCoins(1550, 250),
+function createCoins() {
+    return [createCoinArc(400), createCoinLine(850), createCoinRow(), createCoinStairs(), createCoinArc(2300), createCoinLine(2800)].flat();
+}
 
-            new CollectableCoins(1800, 240),
-            new CollectableCoins(1850, 200),
-            new CollectableCoins(1900, 160),
-            new CollectableCoins(1950, 120),
-            new CollectableCoins(2000, 80),
+function createCoinArc(startX) {
+    return [
+        new CollectableCoins(startX, 230),
+        new CollectableCoins(startX + 50, 150),
+        new CollectableCoins(startX + 100, 90),
+        new CollectableCoins(startX + 150, 150),
+        new CollectableCoins(startX + 200, 230),
+    ];
+}
 
-            new CollectableCoins(2300, 230),
-            new CollectableCoins(2350, 150),
-            new CollectableCoins(2400, 90),
-            new CollectableCoins(2450, 150),
-            new CollectableCoins(2500, 230),
+function createCoinLine(startX) {
+    return [0, 50, 100, 150, 200].map((offset) => new CollectableCoins(startX + offset, 100));
+}
 
-            new CollectableCoins(2800, 70),
-            new CollectableCoins(2850, 70),
-            new CollectableCoins(2900, 70),
-            new CollectableCoins(2950, 70),
-            new CollectableCoins(3000, 70),
-        ],
-        [
-            new CollectableBottles(200),
-            new CollectableBottles(400),
-            new CollectableBottles(800),
-            new CollectableBottles(1200),
-            new CollectableBottles(1600),
-            new CollectableBottles(1800),
-            new CollectableBottles(2200),
-            new CollectableBottles(2600),
-            new CollectableBottles(3000),
-            new CollectableBottles(3400),
-        ],
-    );
+function createCoinRow() {
+    return [1350, 1400, 1450, 1500, 1550].map((x) => new CollectableCoins(x, 250));
+}
+
+function createCoinStairs() {
+    return [1800, 1850, 1900, 1950, 2000].map((x, index) => new CollectableCoins(x, 240 - index * 40));
+}
+
+function createBottles() {
+    return [200, 400, 800, 1200, 1600, 1800, 2200, 2600, 3000, 3400].map((x) => new CollectableBottles(x));
 }

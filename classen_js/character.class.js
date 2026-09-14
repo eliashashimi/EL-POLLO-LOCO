@@ -7,6 +7,7 @@ import { World } from "./world.class.js";
 
 export class Character extends MoveableObject {
     x = 100;
+    xEnd = 3700;
     width = 150;
     height = 350;
     speed = 10;
@@ -47,18 +48,45 @@ export class Character extends MoveableObject {
     }
 
     checkMovementInput() {
-        if (Keyboard.RIGHT) {
+        this.ifKeyboardRight();
+        this.ifKeyboardLeft();
+        this.ifIsMoving();
+        this.ifKeyboardUp();
+    }
+
+    ifKeyboardRight() {
+        if (Keyboard.RIGHT && this.x < this.xEnd) {
             this.moveRight();
             this.lastMove = new Date().getTime();
         }
+    }
+
+    ifKeyboardLeft() {
         if (Keyboard.LEFT && this.x > 0) {
             this.x -= this.speed;
             this.otherDirection = true;
             this.lastMove = new Date().getTime();
         }
+    }
 
+    ifIsMoving() {
+        const isMoving = Keyboard.RIGHT || Keyboard.LEFT;
+        if (isMoving && !this.isAboveGround() && !this.isDead()) {
+            if (AudioHub.PEPE_RUN && AudioHub.PEPE_RUN.file && AudioHub.PEPE_RUN.file.paused) {
+                AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
+            }
+        } else {
+            if (AudioHub.PEPE_RUN && AudioHub.PEPE_RUN.file && !AudioHub.PEPE_RUN.file.paused) {
+                AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
+            }
+        }
+    }
+
+    ifKeyboardUp() {
         if (Keyboard.UP && !this.isAboveGround()) {
             this.jump();
+            AudioHub.PLAY_ONE(AudioHub.PEPE_JUMP);
+            AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
             this.lastMove = new Date().getTime();
         }
     }
@@ -89,16 +117,6 @@ export class Character extends MoveableObject {
             }, 1500);
         }
     }
-
-    // handleMovementSound(isMoving) {
-    //     if (isMoving) {
-    //         if (AudioHub.PEPE_RUN.file.paused) {
-    //             AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
-    //         } else {
-    //             AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
-    //         }
-    //     }
-    // }
 
     handleSnoringSound() {
         if (this.isSleeping() && !this.isDead() && !this.isHurt() && !this.isMoving && !this.isAboveGround()) {
