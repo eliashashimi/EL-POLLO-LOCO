@@ -189,16 +189,21 @@ function startNewGame() {
 
 /** Shows or hides touch controls based on the current device and game state. */
 function checkIsMobile() {
-    const isMobile =
-        "ontouchstart" in window ||
-        navigator.maxTouchPoints > 0 ||
-        window.innerWidth <= 1024 ||
-        window.matchMedia("(pointer: coarse)").matches ||
-        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobile = isMobileDevice();
     const controls = document.getElementById("mobile-controls");
     if (controls) {
         !isMobile || window.isGameOver ? controls.classList.add("d-none") : controls.classList.remove("d-none");
     }
+}
+
+/** Detects touch-capable mobile devices without classifying narrow desktop windows as mobile. */
+function isMobileDevice() {
+    return (
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.matchMedia("(pointer: coarse)").matches ||
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    );
 }
 
 /** Renders the appropriate keyboard or touch instruction template.
@@ -375,6 +380,4 @@ document.querySelectorAll(".btn-restart").forEach((btn) => {
     btn.addEventListener("click", startNewGame);
 });
 
-const isMobileDevice =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 1024 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-updateControlInstructions(isMobileDevice);
+updateControlInstructions(isMobileDevice());
