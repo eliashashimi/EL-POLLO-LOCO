@@ -1,5 +1,8 @@
 import { MyAudio } from "./my-audio.class.js";
 
+/** Central registry and playback API for all game sounds.
+ * @extends MyAudio
+ */
 export class AudioHub extends MyAudio {
     static IS_MUTED = false;
 
@@ -36,6 +39,12 @@ export class AudioHub extends MyAudio {
         AudioHub.BACKGROUND_MUSIC,
     ];
 
+    /** Plays one sound unless global muting is enabled.
+     * @static
+     * @param {MyAudio} sound Sound wrapper to play.
+     * @param {boolean} [loop=false] Whether playback should loop.
+     * @returns {void}
+     */
     static PLAY_ONE(sound, loop = false) {
         if (AudioHub.IS_MUTED) return;
 
@@ -49,6 +58,9 @@ export class AudioHub extends MyAudio {
         sound.file.play().catch(() => {});
     }
 
+    /** Stops and rewinds every registered sound.
+     * @static
+     */
     static STOP_ALL() {
         AudioHub.ALL_SOUNDS.forEach((sound) => {
             sound.file.pause();
@@ -56,6 +68,10 @@ export class AudioHub extends MyAudio {
         });
     }
 
+    /** Stops one sound without changing the global mute state.
+     * @static
+     * @param {MyAudio} sound Sound wrapper to stop.
+     */
     static STOP_ONE(sound) {
         sound.file.pause();
     }

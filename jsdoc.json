@@ -1,0 +1,13 @@
+{
+    "source": {
+        "include": ["classen_js", "js", "levels", "game.js"],
+        "includePattern": ".+\\.js$",
+        "excludePattern": "(^|[\\\\/])_"
+    },
+    "opts": {
+        "destination": "./docs",
+        "includeSource": true,
+        "private": true,
+        "recurse": true
+    }
+}

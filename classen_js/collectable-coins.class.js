@@ -1,6 +1,9 @@
 import { ImageHub } from "./image-hub.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
 
+/** Rotating coin that can be collected by the player.
+ * @extends MoveableObject
+ */
 export class CollectableCoins extends MoveableObject {
     x;
     y;
@@ -13,6 +16,7 @@ export class CollectableCoins extends MoveableObject {
         bottom: 60,
     };
 
+    /** @param {number} x Horizontal position. @param {number} y Vertical position. */
     constructor(x, y) {
         super().loadImage(ImageHub.COINS.coins[0]);
         this.loadImages(ImageHub.COINS.coins);
@@ -22,6 +26,7 @@ export class CollectableCoins extends MoveableObject {
         this.animate();
     }
 
+    /** Starts the coin rotation animation. */
     animate() {
         setInterval(() => {
             if (window.isGamePaused) return;

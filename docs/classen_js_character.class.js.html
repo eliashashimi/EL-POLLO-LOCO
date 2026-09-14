@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: classen_js/character.class.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: classen_js/character.class.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { AudioHub } from "./audio-hub.class.js";
+import { ImageHub } from "./image-hub.class.js";
+import { IntervalHub } from "./interval-hub.class.js";
+import { Keyboard } from "./keyboard.class.js";
+import { MoveableObject } from "./moveable-object.class.js";
+import { World } from "./world.class.js";
+
+/** Main player character with input handling, physics, animation, and audio.
+ * @extends MoveableObject
+ */
+export class Character extends MoveableObject {
+    x = 100;
+    xEnd = 3700;
+    width = 150;
+    height = 350;
+    speed = 10;
+    lastMove = 0;
+    slowerAnimation = 0;
+    isImmuneAfterKill = false;
+    gameOverTriggered = false;
+    isMoving = false;
+
+    /** Loads all player animations and starts physics and animation processing. */
+    constructor() {
+        super().loadImage(ImageHub.PEPE.idle[0]);
+        this.loadImages(ImageHub.PEPE.idle);
+        this.loadImages(ImageHub.PEPE.longIdle);
+        this.loadImages(ImageHub.PEPE.walk);
+        this.loadImages(ImageHub.PEPE.jump);
+        this.loadImages(ImageHub.PEPE.hurt);
+        this.loadImages(ImageHub.PEPE.dead);
+        this.applyGravity();
+        this.getRealFrame();
+        this.animate();
+        this.lastMove = new Date().getTime();
+    }
+
+    /** Starts the player update loop and throttles graphic updates. */
+    animate() {
+        IntervalHub.startInterval(() => {
+            this.handlePhysics();
+            if (this.slowerAnimation % 4 === 0) {
+                this.handleGraphics();
+            }
+            this.slowerAnimation++;
+        }, 1000 / 60);
+    }
+
+    /** Updates movement input while respecting pause and game-over state. */
+    handlePhysics() {
+        if (window.isGamePaused || window.isGameOver) return;
+        this.isMoving = (Keyboard.RIGHT || Keyboard.LEFT) &amp;&amp; !this.isDead() &amp;&amp; !this.isAboveGround();
+        if (!this.isDead()) this.checkMovementInput();
+    }
+
+    /** Dispatches the currently pressed movement and jump controls. */
+    checkMovementInput() {
+        this.ifKeyboardRight();
+        this.ifKeyboardLeft();
+        this.ifIsMoving();
+        this.ifKeyboardUp();
+    }
+
+    /** Moves right while the player remains within the level boundary. */
+    ifKeyboardRight() {
+        if (Keyboard.RIGHT &amp;&amp; this.x &lt; this.xEnd) {
+            this.moveRight();
+            this.lastMove = new Date().getTime();
+        }
+    }
+
+    /** Moves left while the player remains within the level boundary. */
+    ifKeyboardLeft() {
+        if (Keyboard.LEFT &amp;&amp; this.x > 0) {
+            this.x -= this.speed;
+            this.otherDirection = true;
+            this.lastMove = new Date().getTime();
+        }
+    }
+
+    /** Starts or stops running audio according to horizontal movement. */
+    ifIsMoving() {
+        const isMoving = Keyboard.RIGHT || Keyboard.LEFT;
+        if (isMoving &amp;&amp; !this.isAboveGround() &amp;&amp; !this.isDead()) {
+            if (AudioHub.PEPE_RUN &amp;&amp; AudioHub.PEPE_RUN.file &amp;&amp; AudioHub.PEPE_RUN.file.paused) {
+                AudioHub.PLAY_ONE(AudioHub.PEPE_RUN, true);
+            }
+        } else {
+            if (AudioHub.PEPE_RUN &amp;&amp; AudioHub.PEPE_RUN.file &amp;&amp; !AudioHub.PEPE_RUN.file.paused) {
+                AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
+            }
+        }
+    }
+
+    /** Starts a jump when the up control is pressed on the ground. */
+    ifKeyboardUp() {
+        if (Keyboard.UP &amp;&amp; !this.isAboveGround()) {
+            this.jump();
+            AudioHub.PLAY_ONE(AudioHub.PEPE_JUMP);
+            AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
+            this.lastMove = new Date().getTime();
+        }
+    }
+
+    /** Selects the visual and sound state for the current player condition. */
+    handleGraphics() {
+        if (window.isGamePaused || window.isGameOver) return;
+        this.handleSnoringSound();
+
+        if (this.isDead()) return this.handleDeath();
+        if (this.isHurt() &amp;&amp; !this.isImmuneAfterKill) return this.playAnimation(ImageHub.PEPE.hurt);
+        if (this.isAboveGround()) return this.playAnimation(ImageHub.PEPE.jump);
+        if (this.isMoving) return this.playAnimation(ImageHub.PEPE.walk);
+        this.handleAnimations();
+    }
+
+    /** Chooses idle or long-idle animation based on inactivity duration. */
+    handleAnimations() {
+        if (this.isSleeping() &amp;&amp; this.slowerAnimation % 5 === 0) this.playAnimation(ImageHub.PEPE.longIdle);
+        if (!this.isSleeping() &amp;&amp; this.slowerAnimation % 3 === 0) this.playAnimation(ImageHub.PEPE.idle);
+    }
+
+    /** Plays the death sequence and schedules the game-over screen once. */
+    handleDeath() {
+        this.playAnimation(ImageHub.PEPE.dead);
+        AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
+        if (!this.gameOverTriggered) {
+            this.gameOverTriggered = true;
+            setTimeout(() => {
+                window.showGameOver();
+            }, 1500);
+        }
+    }
+
+    /** Synchronizes snoring audio with the sleeping player state. */
+    handleSnoringSound() {
+        if (this.isSleeping() &amp;&amp; !this.isDead() &amp;&amp; !this.isHurt() &amp;&amp; !this.isMoving &amp;&amp; !this.isAboveGround()) {
+            if (AudioHub.PEPE_SNORING.file.paused) AudioHub.PLAY_ONE(AudioHub.PEPE_SNORING, true);
+        } else {
+            AudioHub.STOP_ONE(AudioHub.PEPE_SNORING);
+        }
+    }
+
+    /** @returns {boolean} Whether the player has been inactive for four seconds. */
+    isSleeping() {
+        let timePassed = new Date().getTime() - this.lastMove;
+        return timePassed > 4000;
+    }
+
+    /** Gives the player an upward impulse after defeating an enemy. */
+    bounce() {
+        this.speedY = 12;
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AudioHub.html">AudioHub</a></li><li><a href="BackgroundObject.html">BackgroundObject</a></li><li><a href="Character.html">Character</a></li><li><a href="Chicken.html">Chicken</a></li><li><a href="Cloud.html">Cloud</a></li><li><a href="CollectableBottles.html">CollectableBottles</a></li><li><a href="CollectableCoins.html">CollectableCoins</a></li><li><a href="DrawableObject.html">DrawableObject</a></li><li><a href="Endboss.html">Endboss</a></li><li><a href="ImageHub.html">ImageHub</a></li><li><a href="IntervalHub.html">IntervalHub</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="Level.html">Level</a></li><li><a href="MoveableObject.html">MoveableObject</a></li><li><a href="MyAudio.html">MyAudio</a></li><li><a href="SmallChicken.html">SmallChicken</a></li><li><a href="Statusbar.html">Statusbar</a></li><li><a href="ThrowableObject.html">ThrowableObject</a></li><li><a href="World.html">World</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addLevel1">addLevel1</a></li><li><a href="global.html#backToHome">backToHome</a></li><li><a href="global.html#bindTouchButton">bindTouchButton</a></li><li><a href="global.html#bindTouchEnd">bindTouchEnd</a></li><li><a href="global.html#bindTouchStart">bindTouchStart</a></li><li><a href="global.html#checkIsMobile">checkIsMobile</a></li><li><a href="global.html#createBottles">createBottles</a></li><li><a href="global.html#createChickens">createChickens</a></li><li><a href="global.html#createCoinArc">createCoinArc</a></li><li><a href="global.html#createCoinLine">createCoinLine</a></li><li><a href="global.html#createCoinRow">createCoinRow</a></li><li><a href="global.html#createCoinStairs">createCoinStairs</a></li><li><a href="global.html#createCoins">createCoins</a></li><li><a href="global.html#hideEndScreens">hideEndScreens</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initAudioSettings">initAudioSettings</a></li><li><a href="global.html#instructionsTemp">instructionsTemp</a></li><li><a href="global.html#mobileInstructionsTemp">mobileInstructionsTemp</a></li><li><a href="global.html#preventDoubleTapZoom">preventDoubleTapZoom</a></li><li><a href="global.html#preventMultiTouchZoom">preventMultiTouchZoom</a></li><li><a href="global.html#startNewGame">startNewGame</a></li><li><a href="global.html#toggleMute">toggleMute</a></li><li><a href="global.html#togglePause">togglePause</a></li><li><a href="global.html#updateControlInstructions">updateControlInstructions</a></li><li><a href="global.html#updateMuteAudio">updateMuteAudio</a></li><li><a href="global.html#updateMuteButtonUI">updateMuteButtonUI</a></li><li><a href="global.html#updateMuteIcons">updateMuteIcons</a></li><li><a href="global.html#zoomLock">zoomLock</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Sep 14 2026 06:32:27 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

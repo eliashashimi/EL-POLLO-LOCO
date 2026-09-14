@@ -33,6 +33,7 @@ const btnInGamePause = document.getElementById("btn-ingame-pause");
 const btnResume = document.getElementById("btn-resume");
 window.isPepeRunningSoundPlaying = false;
 
+/** Initializes the game world, audio settings, and mobile zoom protection. */
 function init() {
     hideEndScreens();
     initAudioSettings();
@@ -42,11 +43,13 @@ function init() {
     zoomLock();
 }
 
+/** Installs both touch zoom prevention handlers. */
 function zoomLock() {
     preventMultiTouchZoom();
     preventDoubleTapZoom();
 }
 
+/** Prevents browser zoom gestures involving multiple touch points. */
 function preventMultiTouchZoom() {
     document.addEventListener(
         "touchstart",
@@ -57,6 +60,7 @@ function preventMultiTouchZoom() {
     );
 }
 
+/** Prevents rapid double-tap zoom on touch devices. */
 function preventDoubleTapZoom() {
     let lastTouchEnd = 0;
     document.addEventListener(
@@ -70,11 +74,13 @@ function preventDoubleTapZoom() {
     );
 }
 
+/** Hides both game result screens. */
 function hideEndScreens() {
     if (gameOverScreen) gameOverScreen.classList.add("d-none");
     if (gameWinScreen) gameWinScreen.classList.add("d-none");
 }
 
+/** Restores persisted mute and volume settings and refreshes the UI. */
 function initAudioSettings() {
     const savedMuteStatus = localStorage.getItem("elPolloLoco_muted");
     AudioHub.IS_MUTED = savedMuteStatus === "true";
@@ -87,11 +93,13 @@ function initAudioSettings() {
     updateMuteButtonUI();
 }
 
+/** Synchronizes mute playback and icon state. */
 function updateMuteButtonUI() {
     updateMuteAudio();
     updateMuteIcons();
 }
 
+/** Starts or stops background audio according to current state. */
 function updateMuteAudio() {
     if (AudioHub.IS_MUTED) {
         AudioHub.STOP_ALL();
@@ -100,6 +108,7 @@ function updateMuteAudio() {
     }
 }
 
+/** Updates the main and in-game mute icon sources and labels. */
 function updateMuteIcons() {
     const mainMuteIcon = btnMute ? btnMute.querySelector("img") : null;
     const ingameMuteIcon = btnInGameMute ? btnInGameMute.querySelector("img") : null;
@@ -146,6 +155,7 @@ if (btnGraphics) {
     });
 }
 
+/** Toggles the active game's pause state and pause screen. */
 function togglePause() {
     if (!world) return;
     isPaused = !isPaused;
@@ -163,6 +173,7 @@ if (btnStart) {
     btnStart.addEventListener("click", startNewGame);
 }
 
+/** Resets global game state and starts a new world instance. */
 function startNewGame() {
     window.scrollTo(0, 1);
     hideEndScreens();
@@ -176,6 +187,7 @@ function startNewGame() {
     init();
 }
 
+/** Shows or hides touch controls based on the current device and game state. */
 function checkIsMobile() {
     const isMobile =
         "ontouchstart" in window ||
@@ -189,6 +201,9 @@ function checkIsMobile() {
     }
 }
 
+/** Renders the appropriate keyboard or touch instruction template.
+ * @param {boolean} isMobile Whether mobile instructions should be used.
+ */
 function updateControlInstructions(isMobile) {
     const list = document.getElementById("instructions-list");
     if (!list) return;
@@ -211,6 +226,10 @@ if (btnInGamePause) btnInGamePause.addEventListener("click", togglePause);
 if (btnResume) btnResume.addEventListener("click", togglePause);
 if (btnInGameMute) btnInGameMute.addEventListener("click", toggleMute);
 
+/** Connects a touch control element to one shared keyboard state.
+ * @param {string} elementId DOM id of the touch button.
+ * @param {string} keyboardKey Keyboard state property to update.
+ */
 function bindTouchButton(elementId, keyboardKey) {
     const btn = document.getElementById(elementId);
     if (!btn) return;
@@ -218,6 +237,10 @@ function bindTouchButton(elementId, keyboardKey) {
     bindTouchEnd(btn, keyboardKey);
 }
 
+/** Binds the touch-start transition for a virtual control.
+ * @param {HTMLElement} btn Touch control element.
+ * @param {string} keyboardKey Keyboard state property to set.
+ */
 function bindTouchStart(btn, keyboardKey) {
     btn.addEventListener("touchstart", (e) => {
         e.preventDefault();
@@ -229,6 +252,10 @@ function bindTouchStart(btn, keyboardKey) {
     });
 }
 
+/** Binds the touch-end transition for a virtual control.
+ * @param {HTMLElement} btn Touch control element.
+ * @param {string} keyboardKey Keyboard state property to clear.
+ */
 function bindTouchEnd(btn, keyboardKey) {
     btn.addEventListener("touchend", (e) => {
         e.preventDefault();
@@ -244,6 +271,7 @@ bindTouchButton("touch-right", "RIGHT");
 bindTouchButton("touch-jump", "UP");
 bindTouchButton("touch-throw", "Space");
 
+/** Toggles persisted mute state and synchronizes playback and controls. */
 function toggleMute() {
     AudioHub.IS_MUTED = !AudioHub.IS_MUTED;
     localStorage.setItem("elPolloLoco_muted", AudioHub.IS_MUTED);
@@ -255,6 +283,7 @@ function toggleMute() {
     }
 }
 
+/** Stops the active game and returns to the landing page. */
 function backToHome() {
     hideEndScreens();
     IntervalHub.stopAllInterval();
@@ -263,6 +292,9 @@ function backToHome() {
     landingPage.classList.remove("d-none");
 }
 
+/** Displays the game-over screen and stops active gameplay.
+ * @returns {void}
+ */
 window.showGameOver = function () {
     window.isGameOver = true;
     AudioHub.STOP_ALL();
@@ -274,6 +306,9 @@ window.showGameOver = function () {
     checkIsMobile();
 };
 
+/** Displays the win screen and stops active gameplay.
+ * @returns {void}
+ */
 window.showGameWin = function () {
     window.isGameOver = true;
     AudioHub.STOP_ALL();

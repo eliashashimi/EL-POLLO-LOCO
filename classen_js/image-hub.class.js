@@ -1,3 +1,4 @@
+/** Static catalogue of image paths used by all game entities and screens. */
 export class ImageHub {
     static START_PAGE = {
         landingPage: ["assets/img/9_intro_outro_screens/start/startscreen_1.png"],

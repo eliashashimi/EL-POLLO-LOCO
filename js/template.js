@@ -1,3 +1,6 @@
+/** Returns the mobile controls instruction markup.
+ * @returns {string} HTML fragment for touch controls.
+ */
 export function mobileInstructionsTemp() {
     return /*html*/ `
         <p><strong>Links</strong><img src="./assets/icons/chevron-double-left.svg" alt="Links" style="width:30px;" /></p>
@@ -7,6 +10,9 @@ export function mobileInstructionsTemp() {
     `;
 }
 
+/** Returns the desktop controls instruction markup.
+ * @returns {string} HTML fragment for keyboard controls.
+ */
 export function instructionsTemp() {
     return /*html*/ `
         <p><strong>Links</strong><img src="./assets/icons/arrow-left-square.svg" alt="Pfeiltaste Links" /></p>

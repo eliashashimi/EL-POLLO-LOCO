@@ -1,6 +1,9 @@
 import { ImageHub } from "./image-hub.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
 
+/** Salsa bottle collectible that cycles through ground images.
+ * @extends MoveableObject
+ */
 export class CollectableBottles extends MoveableObject {
     height = 80;
     width = 80;
@@ -14,6 +17,7 @@ export class CollectableBottles extends MoveableObject {
         bottom: 30,
     };
 
+    /** @param {number} x Horizontal position of the bottle. */
     constructor(x) {
         super().loadImage(ImageHub.SALSA_BOTTLE.onground[0]);
         this.loadImages(ImageHub.SALSA_BOTTLE.onground);
@@ -22,6 +26,7 @@ export class CollectableBottles extends MoveableObject {
         this.animate();
     }
 
+    /** Starts the bottle animation. */
     animate() {
         setInterval(() => {
             if (window.isGamePaused) return;

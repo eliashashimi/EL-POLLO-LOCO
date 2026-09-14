@@ -11,6 +11,11 @@ import { SmallChicken } from "./small-chicken.class.js";
 import { Statusbar } from "./statusbar.class.js";
 import { ThrowableObject } from "./throwable-object.class.js";
 
+/**
+ * Coordinates the game level, player, collisions, rendering, collectibles,
+ * projectiles, camera movement, and status bars.
+ * @class
+ */
 export class World {
     level;
     character;
@@ -32,6 +37,10 @@ export class World {
     maxWitdh;
     maxCameraPos;
 
+    /**
+     * Creates a game world and starts its render and update loops.
+     * @param {HTMLCanvasElement} canvas Canvas used for rendering the game.
+     */
     constructor(canvas) {
         this.ctx = canvas.getContext("2d");
         World.canvas = canvas;
@@ -48,6 +57,7 @@ export class World {
         AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
     }
 
+    /** Starts the recurring collision and projectile checks. */
     run() {
         setInterval(() => {
             if (window.isGamePaused) return;
@@ -60,11 +70,16 @@ export class World {
         }, 1000 / 5);
     }
 
+    /** Creates a projectile when the current input and player state allow it. */
     checkThrowableObjects() {
         if (!this.canThrowBottle()) return;
         this.throwBottle();
     }
 
+    /**
+     * Determines whether the player can throw a bottle at this moment.
+     * @returns {boolean} Whether a bottle may be thrown.
+     */
     canThrowBottle() {
         return (
             Keyboard.Space &&
@@ -76,6 +91,7 @@ export class World {
         );
     }
 
+    /** Removes one bottle from the inventory and creates its projectile. */
     throwBottle() {
         this.isThrowing = true;
         const x = this.character.otherDirection ? this.character.x - 10 : this.character.x + 100;
@@ -86,6 +102,7 @@ export class World {
         this.statusbarBottles.setPercentage(this.bottles * 10);
     }
 
+    /** Runs all player, enemy, collectible, and projectile collision checks. */
     checkCollisions() {
         this.checkCollisionEnemy();
         this.checkCollisionEndboss();
@@ -96,6 +113,7 @@ export class World {
         this.bottlesCollisionEnemy();
     }
 
+    /** Resolves projectile collisions and removes completed projectiles. */
     bottlesCollisionEnemy() {
         this.throwableObjects.forEach((bottle) => {
             if (bottle.bottleSplashed) return;
@@ -111,6 +129,11 @@ export class World {
         }
     }
 
+    /**
+     * Applies a projectile hit to a normal or small chicken.
+     * @param {Chicken|SmallChicken} enemy Enemy that may be hit.
+     * @param {ThrowableObject} bottle Projectile being tested.
+     */
     checkBottleHitEnemy(enemy, bottle) {
         if (!bottle || !enemy || enemy.isDeadEnemy) return;
 
@@ -126,6 +149,11 @@ export class World {
         }
     }
 
+    /**
+     * Applies projectile damage to the endboss and triggers the win screen.
+     * @param {Endboss} enemy Endboss that may be hit.
+     * @param {ThrowableObject} bottle Projectile being tested.
+     */
     checkBottleHitEndboss(enemy, bottle) {
         if (enemy instanceof Endboss && enemy.isColliding(bottle) && !bottle.bottleSplashed) {
             enemy.hit(20);
@@ -140,6 +168,7 @@ export class World {
         }
     }
 
+    /** Applies contact damage from the endboss to the player. */
     checkCollisionEndboss() {
         if (!this.endboss || window.isGamePaused || window.isGameOver) return;
         if (this.endboss.isDead && this.endboss.isDead()) return;
@@ -153,6 +182,7 @@ export class World {
         }
     }
 
+    /** Checks contact between the player and every living chicken. */
     checkCollisionEnemy() {
         if (window.isGamePaused || window.isGameOver) return;
         this.level.chickens.forEach((enemy) => {
@@ -164,6 +194,10 @@ export class World {
         });
     }
 
+    /**
+     * Distinguishes a jump attack from damaging contact with an enemy.
+     * @param {Chicken|SmallChicken} enemy Enemy involved in the collision.
+     */
     handleEnemyCollisionType(enemy) {
         if (this.character.isAboveGround() && this.character.speedY < 0) {
             this.executeEnemyDead(enemy);
@@ -172,6 +206,10 @@ export class World {
         }
     }
 
+    /**
+     * Defeats an enemy hit from above and briefly protects the player.
+     * @param {Chicken|SmallChicken} enemy Enemy defeated by the player.
+     */
     executeEnemyDead(enemy) {
         this.character.isImmuneAfterKill = true;
         // enemy.isDeadEnemy = true;
@@ -189,12 +227,14 @@ export class World {
         }, 200);
     }
 
+    /** Applies contact damage to the player and updates its health bar. */
     executePepeDamage() {
         this.character.hit();
         this.statusbarHealth.setPercentage(this.character.energy);
         AudioHub.PLAY_ONE(AudioHub.PEPE_DAMAGE);
     }
 
+    /** Collects coins touched by the player and updates the coin bar. */
     checkCollisionCoins() {
         this.level.collectableCoins.forEach((coins, index) => {
             if (this.character.isColliding(coins)) {
@@ -206,6 +246,7 @@ export class World {
         });
     }
 
+    /** Collects bottles touched by the player and updates the bottle bar. */
     checkCollisionBottles() {
         this.level.collectableBottles.forEach((bottle, index) => {
             if (this.character.isColliding(bottle)) {
@@ -217,6 +258,7 @@ export class World {
         });
     }
 
+    /** Draws one frame, updates the camera, and schedules the next frame. */
     draw() {
         this.ctx.clearRect(0, 0, World.canvas.width, World.canvas.height);
         if (this.character) World.camera_x = -this.character.x + 100;
@@ -227,12 +269,14 @@ export class World {
         requestAnimationFrame(() => this.draw());
     }
 
+    /** Draws world objects within the current camera transform. */
     drawWorld() {
         this.ctx.translate(World.camera_x, 0);
         this.drawObjects();
         this.ctx.translate(-World.camera_x, 0);
     }
 
+    /** Draws all status bars without applying the world camera transform. */
     drawStatusbars() {
         this.addToMap(this.statusbarHealth);
         this.addToMap(this.statusbarCoins);
@@ -240,6 +284,7 @@ export class World {
         this.addToMap(this.statusbarEndboss);
     }
 
+    /** Refreshes collision frames for all active game objects. */
     setRealFrames() {
         this.character.getRealFrame();
         this.endboss.getRealFrame();
@@ -249,6 +294,7 @@ export class World {
         this.throwableObjects.forEach((bottle) => bottle.getRealFrame());
     }
 
+    /** Draws backgrounds, actors, collectibles, projectiles, and the boss. */
     drawObjects() {
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
@@ -260,10 +306,18 @@ export class World {
         this.endboss.draw(this.ctx);
     }
 
+    /**
+     * Draws each object in a collection using the world rendering context.
+     * @param {DrawableObject[]} objects Objects to draw.
+     */
     addObjectsToMap(objects) {
         objects.forEach((object) => object.draw(this.ctx));
     }
 
+    /**
+     * Draws one object while handling horizontal mirroring.
+     * @param {DrawableObject} mo Object to draw.
+     */
     addToMap(mo) {
         if (mo.otherDirection) {
             this.flipImage(mo);
@@ -274,6 +328,10 @@ export class World {
         }
     }
 
+    /**
+     * Temporarily mirrors an object's canvas coordinate system.
+     * @param {DrawableObject} mo Object being mirrored.
+     */
     flipImage(mo) {
         this.ctx.save();
         this.ctx.translate(mo.width, 0);
@@ -281,6 +339,7 @@ export class World {
         mo.x = mo.x * -1;
     }
 
+    /** Restores the coordinates after drawing a mirrored object. */
     flipImageBack(mo) {
         mo.x = mo.x * -1;
         this.ctx.restore();

@@ -1,3 +1,4 @@
+/** Shared keyboard state used by the player and world controllers. */
 export class Keyboard {
     static LEFT = false;
     static RIGHT = false;

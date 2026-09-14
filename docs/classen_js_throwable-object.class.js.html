@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: classen_js/throwable-object.class.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: classen_js/throwable-object.class.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { AudioHub } from "./audio-hub.class.js";
+import { ImageHub } from "./image-hub.class.js";
+import { MoveableObject } from "./moveable-object.class.js";
+
+/** A thrown salsa bottle with flight, rotation, splash, and removal states.
+ * @extends MoveableObject
+ */
+export class ThrowableObject extends MoveableObject {
+    throwBottleAir = true;
+    throwBottleCount = 0;
+    throwBottleRemoved = false;
+    bottleSplashed = false;
+    bottleSplashStart = false;
+    bottleSplashedEnd = false;
+    bottleContact = false;
+
+    height = 60;
+    width = 60;
+
+    offset = {
+        left: 20,
+        top: 20,
+        right: 20,
+        bottom: 20,
+    };
+    /** @param {number} x Start position. @param {number} y Start height. @param {boolean} direction Whether it faces left. */
+    constructor(x, y, direction) {
+        super().loadImage(ImageHub.SALSA_BOTTLE.salsaBottle[0]);
+        this.loadImages(ImageHub.SALSA_BOTTLE.onground);
+        this.loadImages(ImageHub.SALSA_BOTTLE.rotation);
+        this.loadImages(ImageHub.SALSA_BOTTLE.splash);
+        this.x = x;
+        this.y = y;
+        this.otherDirection = direction;
+        this.getRealFrame();
+        this.throw();
+        this.speedY = 20;
+        this.amount = 0;
+        this.animate();
+    }
+
+    /** Starts projectile motion and triggers a splash on ground contact. */
+    throw() {
+        this.amount--;
+        this.applyGravity();
+        this.throwInterval = setInterval(() => {
+            if (window.isGamePaused) return;
+            if (this.otherDirection == true) {
+                this.x -= 20;
+            } else {
+                this.x += 20;
+            }
+            if (this.y >= 430) {
+                this.y = 430;
+                this.splash();
+            }
+        }, 1000 / 30);
+    }
+
+    /** @returns {boolean} Whether the bottle is still airborne. */
+    isAboveGround() {
+        return this.y &lt; 430 &amp;&amp; !this.bottleSplashed;
+    }
+
+    /** Stops flight and marks the bottle for splash animation. */
+    splash() {
+        if (!this.bottleSplashed) {
+            this.bottleSplashed = true;
+            this.throwBottleAir = false;
+            this.speedY = 0;
+            clearInterval(this.throwInterval);
+            AudioHub.PLAY_ONE(AudioHub.BOTTLE_BREAK);
+        }
+    }
+
+    /** Animates rotation during flight and splash frames after impact. */
+    animate() {
+        let splashIndex = 0;
+
+        setInterval(() => {
+            if (this.throwBottleAir &amp;&amp; !this.bottleSplashed) {
+                this.playAnimation(ImageHub.SALSA_BOTTLE.rotation);
+            } else if (this.bottleSplashed &amp;&amp; !this.throwBottleRemoved) {
+                if (splashIndex &lt; ImageHub.SALSA_BOTTLE.splash.length) {
+                    this.img = this.imageCache[ImageHub.SALSA_BOTTLE.splash[splashIndex]];
+                    splashIndex++;
+                } else {
+                    this.throwBottleRemoved = true;
+                }
+            }
+        }, 1000 / 20);
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AudioHub.html">AudioHub</a></li><li><a href="BackgroundObject.html">BackgroundObject</a></li><li><a href="Character.html">Character</a></li><li><a href="Chicken.html">Chicken</a></li><li><a href="Cloud.html">Cloud</a></li><li><a href="CollectableBottles.html">CollectableBottles</a></li><li><a href="CollectableCoins.html">CollectableCoins</a></li><li><a href="DrawableObject.html">DrawableObject</a></li><li><a href="Endboss.html">Endboss</a></li><li><a href="ImageHub.html">ImageHub</a></li><li><a href="IntervalHub.html">IntervalHub</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="Level.html">Level</a></li><li><a href="MoveableObject.html">MoveableObject</a></li><li><a href="MyAudio.html">MyAudio</a></li><li><a href="SmallChicken.html">SmallChicken</a></li><li><a href="Statusbar.html">Statusbar</a></li><li><a href="ThrowableObject.html">ThrowableObject</a></li><li><a href="World.html">World</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addLevel1">addLevel1</a></li><li><a href="global.html#backToHome">backToHome</a></li><li><a href="global.html#bindTouchButton">bindTouchButton</a></li><li><a href="global.html#bindTouchEnd">bindTouchEnd</a></li><li><a href="global.html#bindTouchStart">bindTouchStart</a></li><li><a href="global.html#checkIsMobile">checkIsMobile</a></li><li><a href="global.html#createBottles">createBottles</a></li><li><a href="global.html#createChickens">createChickens</a></li><li><a href="global.html#createCoinArc">createCoinArc</a></li><li><a href="global.html#createCoinLine">createCoinLine</a></li><li><a href="global.html#createCoinRow">createCoinRow</a></li><li><a href="global.html#createCoinStairs">createCoinStairs</a></li><li><a href="global.html#createCoins">createCoins</a></li><li><a href="global.html#hideEndScreens">hideEndScreens</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initAudioSettings">initAudioSettings</a></li><li><a href="global.html#instructionsTemp">instructionsTemp</a></li><li><a href="global.html#mobileInstructionsTemp">mobileInstructionsTemp</a></li><li><a href="global.html#preventDoubleTapZoom">preventDoubleTapZoom</a></li><li><a href="global.html#preventMultiTouchZoom">preventMultiTouchZoom</a></li><li><a href="global.html#startNewGame">startNewGame</a></li><li><a href="global.html#toggleMute">toggleMute</a></li><li><a href="global.html#togglePause">togglePause</a></li><li><a href="global.html#updateControlInstructions">updateControlInstructions</a></li><li><a href="global.html#updateMuteAudio">updateMuteAudio</a></li><li><a href="global.html#updateMuteButtonUI">updateMuteButtonUI</a></li><li><a href="global.html#updateMuteIcons">updateMuteIcons</a></li><li><a href="global.html#zoomLock">zoomLock</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Sep 14 2026 06:32:27 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -2,6 +2,9 @@ import { AudioHub } from "./audio-hub.class.js";
 import { ImageHub } from "./image-hub.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
 
+/** A thrown salsa bottle with flight, rotation, splash, and removal states.
+ * @extends MoveableObject
+ */
 export class ThrowableObject extends MoveableObject {
     throwBottleAir = true;
     throwBottleCount = 0;
@@ -20,6 +23,7 @@ export class ThrowableObject extends MoveableObject {
         right: 20,
         bottom: 20,
     };
+    /** @param {number} x Start position. @param {number} y Start height. @param {boolean} direction Whether it faces left. */
     constructor(x, y, direction) {
         super().loadImage(ImageHub.SALSA_BOTTLE.salsaBottle[0]);
         this.loadImages(ImageHub.SALSA_BOTTLE.onground);
@@ -35,6 +39,7 @@ export class ThrowableObject extends MoveableObject {
         this.animate();
     }
 
+    /** Starts projectile motion and triggers a splash on ground contact. */
     throw() {
         this.amount--;
         this.applyGravity();
@@ -52,10 +57,12 @@ export class ThrowableObject extends MoveableObject {
         }, 1000 / 30);
     }
 
+    /** @returns {boolean} Whether the bottle is still airborne. */
     isAboveGround() {
         return this.y < 430 && !this.bottleSplashed;
     }
 
+    /** Stops flight and marks the bottle for splash animation. */
     splash() {
         if (!this.bottleSplashed) {
             this.bottleSplashed = true;
@@ -66,6 +73,7 @@ export class ThrowableObject extends MoveableObject {
         }
     }
 
+    /** Animates rotation during flight and splash frames after impact. */
     animate() {
         let splashIndex = 0;
 

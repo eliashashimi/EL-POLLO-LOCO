@@ -1,3 +1,4 @@
+/** Base class for objects that can load images and render on the game canvas. */
 export class DrawableObject {
     rX;
     rY;
@@ -12,11 +13,17 @@ export class DrawableObject {
     currentImage = 0;
     otherDirection = false;
 
+    /** Loads the primary image used to render this object.
+     * @param {string} path Image source path.
+     */
     loadImage(path) {
         this.img = new Image();
         this.img.src = path;
     }
 
+    /** Draws the object, mirroring it when it faces the opposite direction.
+     * @param {CanvasRenderingContext2D} ctx Rendering context.
+     */
     draw(ctx) {
         if (this.otherDirection) {
             ctx.save();
@@ -29,6 +36,7 @@ export class DrawableObject {
         }
     }
 
+    /** Updates the reduced collision frame from the object's position and offsets. */
     getRealFrame() {
         this.rX = this.x + this.offset.left;
         this.rY = this.y + this.offset.top;
@@ -36,6 +44,9 @@ export class DrawableObject {
         this.rH = this.height - this.offset.top - this.offset.bottom;
     }
 
+    /** Caches all images in an animation sequence.
+     * @param {string[]} arr Image source paths.
+     */
     loadImages(arr) {
         arr.forEach((path) => {
             let img = new Image();

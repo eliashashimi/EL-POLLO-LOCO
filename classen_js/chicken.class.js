@@ -2,6 +2,9 @@ import { ImageHub } from "./image-hub.class.js";
 import { IntervalHub } from "./interval-hub.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
 
+/** Standard chicken enemy that walks left and cycles through walk frames.
+ * @extends MoveableObject
+ */
 export class Chicken extends MoveableObject {
     width = 80;
     height = 70;
@@ -13,6 +16,7 @@ export class Chicken extends MoveableObject {
         left: 7,
     };
 
+    /** Creates a chicken at a random position in the level. */
     constructor() {
         super().loadImage(ImageHub.CHICKEN.walk[0]);
         this.loadImages(ImageHub.CHICKEN.walk);
@@ -23,6 +27,7 @@ export class Chicken extends MoveableObject {
         this.animate();
     }
 
+    /** Starts movement and animation intervals for the chicken. */
     animate() {
         this.moveLeft();
 

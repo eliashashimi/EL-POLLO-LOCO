@@ -3,6 +3,7 @@ import { Cloud } from "./cloud.class.js";
 import { ImageHub } from "./image-hub.class.js";
 import { World } from "./world.class.js";
 
+/** Complete level definition containing actors, collectibles, and background layers. */
 export class Level {
     chickens;
     endboss;
@@ -13,6 +14,14 @@ export class Level {
     collectableCoins;
     collectableBottles;
 
+    /**
+     * Creates a level and populates its repeating background.
+     * @param {number} sections Number of background sections.
+     * @param {Chicken[]} chickens Regular and small enemies.
+     * @param {Endboss} endboss Level boss.
+     * @param {CollectableCoins[]} collectableCoins Coins in the level.
+     * @param {CollectableBottles[]} collectableBottles Bottles in the level.
+     */
     constructor(sections, chickens, endboss, collectableCoins, collectableBottles) {
         this.sections = sections;
         this.chickens = chickens;
@@ -23,6 +32,7 @@ export class Level {
         this.addBg();
     }
 
+    /** Creates the alternating background and cloud layers for all sections. */
     addBg() {
         for (let i = 0; i < this.sections; i++) {
             const bgThree = ImageHub.BACKGROUND_OBJECT.backgroundThree[i % 2];

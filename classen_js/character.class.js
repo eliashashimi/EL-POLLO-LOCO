@@ -5,6 +5,9 @@ import { Keyboard } from "./keyboard.class.js";
 import { MoveableObject } from "./moveable-object.class.js";
 import { World } from "./world.class.js";
 
+/** Main player character with input handling, physics, animation, and audio.
+ * @extends MoveableObject
+ */
 export class Character extends MoveableObject {
     x = 100;
     xEnd = 3700;
@@ -17,6 +20,7 @@ export class Character extends MoveableObject {
     gameOverTriggered = false;
     isMoving = false;
 
+    /** Loads all player animations and starts physics and animation processing. */
     constructor() {
         super().loadImage(ImageHub.PEPE.idle[0]);
         this.loadImages(ImageHub.PEPE.idle);
@@ -31,6 +35,7 @@ export class Character extends MoveableObject {
         this.lastMove = new Date().getTime();
     }
 
+    /** Starts the player update loop and throttles graphic updates. */
     animate() {
         IntervalHub.startInterval(() => {
             this.handlePhysics();
@@ -41,12 +46,14 @@ export class Character extends MoveableObject {
         }, 1000 / 60);
     }
 
+    /** Updates movement input while respecting pause and game-over state. */
     handlePhysics() {
         if (window.isGamePaused || window.isGameOver) return;
         this.isMoving = (Keyboard.RIGHT || Keyboard.LEFT) && !this.isDead() && !this.isAboveGround();
         if (!this.isDead()) this.checkMovementInput();
     }
 
+    /** Dispatches the currently pressed movement and jump controls. */
     checkMovementInput() {
         this.ifKeyboardRight();
         this.ifKeyboardLeft();
@@ -54,6 +61,7 @@ export class Character extends MoveableObject {
         this.ifKeyboardUp();
     }
 
+    /** Moves right while the player remains within the level boundary. */
     ifKeyboardRight() {
         if (Keyboard.RIGHT && this.x < this.xEnd) {
             this.moveRight();
@@ -61,6 +69,7 @@ export class Character extends MoveableObject {
         }
     }
 
+    /** Moves left while the player remains within the level boundary. */
     ifKeyboardLeft() {
         if (Keyboard.LEFT && this.x > 0) {
             this.x -= this.speed;
@@ -69,6 +78,7 @@ export class Character extends MoveableObject {
         }
     }
 
+    /** Starts or stops running audio according to horizontal movement. */
     ifIsMoving() {
         const isMoving = Keyboard.RIGHT || Keyboard.LEFT;
         if (isMoving && !this.isAboveGround() && !this.isDead()) {
@@ -82,6 +92,7 @@ export class Character extends MoveableObject {
         }
     }
 
+    /** Starts a jump when the up control is pressed on the ground. */
     ifKeyboardUp() {
         if (Keyboard.UP && !this.isAboveGround()) {
             this.jump();
@@ -91,6 +102,7 @@ export class Character extends MoveableObject {
         }
     }
 
+    /** Selects the visual and sound state for the current player condition. */
     handleGraphics() {
         if (window.isGamePaused || window.isGameOver) return;
         this.handleSnoringSound();
@@ -102,11 +114,13 @@ export class Character extends MoveableObject {
         this.handleAnimations();
     }
 
+    /** Chooses idle or long-idle animation based on inactivity duration. */
     handleAnimations() {
         if (this.isSleeping() && this.slowerAnimation % 5 === 0) this.playAnimation(ImageHub.PEPE.longIdle);
         if (!this.isSleeping() && this.slowerAnimation % 3 === 0) this.playAnimation(ImageHub.PEPE.idle);
     }
 
+    /** Plays the death sequence and schedules the game-over screen once. */
     handleDeath() {
         this.playAnimation(ImageHub.PEPE.dead);
         AudioHub.STOP_ONE(AudioHub.PEPE_RUN);
@@ -118,6 +132,7 @@ export class Character extends MoveableObject {
         }
     }
 
+    /** Synchronizes snoring audio with the sleeping player state. */
     handleSnoringSound() {
         if (this.isSleeping() && !this.isDead() && !this.isHurt() && !this.isMoving && !this.isAboveGround()) {
             if (AudioHub.PEPE_SNORING.file.paused) AudioHub.PLAY_ONE(AudioHub.PEPE_SNORING, true);
@@ -126,11 +141,13 @@ export class Character extends MoveableObject {
         }
     }
 
+    /** @returns {boolean} Whether the player has been inactive for four seconds. */
     isSleeping() {
         let timePassed = new Date().getTime() - this.lastMove;
         return timePassed > 4000;
     }
 
+    /** Gives the player an upward impulse after defeating an enemy. */
     bounce() {
         this.speedY = 12;
     }
