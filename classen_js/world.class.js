@@ -260,22 +260,6 @@ export class World {
         this.endboss.draw(this.ctx);
     }
 
-    drawFrames() {
-        this.character.drawFrame(this.ctx);
-        this.endboss.drawFrame(this.ctx);
-        this.level.chickens.forEach((enemy) => enemy.drawFrame(this.ctx));
-        this.level.collectableBottles.forEach((bottle) => bottle.drawFrame(this.ctx));
-        this.level.collectableCoins.forEach((coin) => coin.drawFrame(this.ctx));
-    }
-
-    drawOffsetFrames() {
-        this.character.drawOffsetFrame(this.ctx);
-        this.endboss.drawOffsetFrame(this.ctx);
-        this.level.chickens.forEach((enemy) => enemy.drawOffsetFrame(this.ctx));
-        this.level.collectableBottles.forEach((bottle) => bottle.drawOffsetFrame(this.ctx));
-        this.level.collectableCoins.forEach((coin) => coin.drawOffsetFrame(this.ctx));
-    }
-
     addObjectsToMap(objects) {
         objects.forEach((object) => object.draw(this.ctx));
     }
@@ -285,29 +269,9 @@ export class World {
             this.flipImage(mo);
         }
         mo.draw(this.ctx);
-        this.drawObjectFrames(mo);
         if (mo.otherDirection) {
             this.flipImageBack(mo);
         }
-    }
-
-    drawObjectFrames(mo) {
-        if (!this.hasRealFrame(mo)) return;
-        mo.drawFrame(this.ctx);
-        mo.getRealFrame();
-        mo.drawRealFrame(this.ctx);
-    }
-
-    hasRealFrame(mo) {
-        return (
-            mo instanceof Character ||
-            mo instanceof Chicken ||
-            mo instanceof SmallChicken ||
-            mo instanceof Endboss ||
-            mo instanceof CollectableCoins ||
-            mo instanceof CollectableBottles ||
-            mo instanceof ThrowableObject
-        );
     }
 
     flipImage(mo) {
