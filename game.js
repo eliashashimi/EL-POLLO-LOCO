@@ -9,6 +9,7 @@ let canvas;
 let isPaused;
 let globalVolume = 0.4;
 let highGraphics = true;
+AudioHub.IS_MUTED = true;
 const volumeSlider = document.getElementById("volume-slider");
 const volumeValue = document.getElementById("volume-value");
 const btnGraphics = document.getElementById("btn-graphics");
@@ -80,10 +81,8 @@ function hideEndScreens() {
     if (gameWinScreen) gameWinScreen.classList.add("d-none");
 }
 
-/** Restores persisted mute and volume settings and refreshes the UI. */
+/** Initializes the muted startup state, restores volume, and refreshes the UI. */
 function initAudioSettings() {
-    const savedMuteStatus = localStorage.getItem("elPolloLoco_muted");
-    AudioHub.IS_MUTED = savedMuteStatus === "true";
     const savedVolume = localStorage.getItem("elPolloLoco_volume");
     if (savedVolume !== null) {
         globalVolume = parseFloat(savedVolume);
@@ -177,13 +176,13 @@ if (btnStart) {
 function startNewGame() {
     window.scrollTo(0, 1);
     hideEndScreens();
+    window.isGameOver = false;
     landingPage.classList.add("d-none");
     if (ingameControls) ingameControls.classList.remove("d-none");
     checkIsMobile();
     IntervalHub.stopAllInterval();
     AudioHub.STOP_ALL();
     isPaused = false;
-    window.isGameOver = false;
     init();
 }
 
