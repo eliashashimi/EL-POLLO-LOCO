@@ -158,10 +158,7 @@ canvas {
 .rotate-screen {
     display: none;
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    right: max(10px, env(safe-area-inset-right));
-    bottom: max(10px, env(safe-area-inset-bottom));
-    left: max(10px, env(safe-area-inset-left));
+    height: 100%;
     box-sizing: border-box;
     padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
         max(20px, env(safe-area-inset-left));
