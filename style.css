@@ -159,6 +159,7 @@ canvas {
     display: none;
     position: fixed;
     height: 100%;
+    width: 100%;
     box-sizing: border-box;
     padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
         max(20px, env(safe-area-inset-left));
