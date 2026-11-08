@@ -302,10 +302,10 @@
 
 .ingame-controls {
     position: absolute;
-    top: clamp(8px, 2.5vw, 15px);
-    right: clamp(8px, 2.5vw, 15px);
+    top: 10px;
     z-index: 5;
     display: flex;
+    justify-self: center;
     gap: clamp(6px, 1.5vw, 10px);
 }
 
