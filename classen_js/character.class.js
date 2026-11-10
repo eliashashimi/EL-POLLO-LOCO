@@ -127,7 +127,9 @@ export class Character extends MoveableObject {
         if (!this.gameOverTriggered) {
             this.gameOverTriggered = true;
             setTimeout(() => {
-                window.showGameOver();
+                if (!window.isGameOver) {
+                    window.showGameOver();
+                }
             }, 1500);
         }
     }

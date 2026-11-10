@@ -174,6 +174,7 @@ if (btnStart) {
 
 /** Resets global game state and starts a new world instance. */
 function startNewGame() {
+    if (world) world.isDestroyed = true;
     window.scrollTo(0, 1);
     hideEndScreens();
     window.isGameOver = false;
@@ -289,6 +290,7 @@ function toggleMute() {
 
 /** Stops the active game and returns to the landing page. */
 function backToHome() {
+    if (world) world.isDestroyed = true;
     hideEndScreens();
     IntervalHub.stopAllInterval();
     AudioHub.STOP_ALL();

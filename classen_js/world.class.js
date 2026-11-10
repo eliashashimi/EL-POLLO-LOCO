@@ -6,6 +6,7 @@ import { CollectableBottles } from "./collectable-bottles.class.js";
 import { CollectableCoins } from "./collectable-coins.class.js";
 import { Endboss } from "./endboss.class.js";
 import { ImageHub } from "./image-hub.class.js";
+import { IntervalHub } from "./interval-hub.class.js";
 import { Keyboard } from "./keyboard.class.js";
 import { SmallChicken } from "./small-chicken.class.js";
 import { Statusbar } from "./statusbar.class.js";
@@ -36,6 +37,7 @@ export class World {
     isThrowing = false;
     maxWitdh;
     maxCameraPos;
+    istDestroyed = false;
 
     /**
      * Creates a game world and starts its render and update loops.
@@ -59,15 +61,19 @@ export class World {
 
     /** Starts the recurring collision and projectile checks. */
     run() {
-        setInterval(() => {
+        IntervalHub.startInterval(() => {
             if (window.isGamePaused) return;
             this.setRealFrames();
             this.checkCollisions();
         }, 1000 / 60);
-        setInterval(() => {
+        IntervalHub.startInterval(() => {
             if (window.isGamePaused) return;
             this.checkThrowableObjects();
         }, 1000 / 5);
+    }
+
+    destroy() {
+        clearInterval(this.collision);
     }
 
     /** Creates a projectile when the current input and player state allow it. */
@@ -108,8 +114,8 @@ export class World {
         this.checkCollisionEndboss();
         this.checkCollisionCoins();
         this.checkCollisionBottles();
-        this.checkBottleHitEndboss();
-        this.checkBottleHitEnemy();
+        // this.checkBottleHitEndboss();
+        // this.checkBottleHitEnemy();
         this.bottlesCollisionEnemy();
     }
 
@@ -155,6 +161,7 @@ export class World {
      * @param {ThrowableObject} bottle Projectile being tested.
      */
     checkBottleHitEndboss(enemy, bottle) {
+        if (!bottle || !enemy || bottle.bottleSplashed || enemy.isDead()) return;
         if (enemy instanceof Endboss && enemy.isColliding(bottle) && !bottle.bottleSplashed) {
             enemy.hit(20);
             bottle.splash();
@@ -162,7 +169,9 @@ export class World {
             this.statusbarEndboss.setPercentage(enemy.energy);
             if (enemy.isDead()) {
                 setTimeout(() => {
-                    window.showGameWin();
+                    if (!window.isGameOver) {
+                        window.showGameWin();
+                    }
                 }, 1500);
             }
         }
@@ -260,6 +269,7 @@ export class World {
 
     /** Draws one frame, updates the camera, and schedules the next frame. */
     draw() {
+        if (this.istDestroyed) return;
         this.ctx.clearRect(0, 0, World.canvas.width, World.canvas.height);
         if (this.character) World.camera_x = -this.character.x + 100;
         if (World.camera_x > 0) World.camera_x = 0;
@@ -281,7 +291,9 @@ export class World {
         this.addToMap(this.statusbarHealth);
         this.addToMap(this.statusbarCoins);
         this.addToMap(this.statusbarBottles);
-        this.addToMap(this.statusbarEndboss);
+        if (this.endboss && this.endboss.hadfirstSight) {
+            this.addToMap(this.statusbarEndboss);
+        }
     }
 
     /** Refreshes collision frames for all active game objects. */

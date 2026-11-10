@@ -77,7 +77,7 @@ export class ThrowableObject extends MoveableObject {
     animate() {
         let splashIndex = 0;
 
-        setInterval(() => {
+        this.animateInterval = setInterval(() => {
             if (this.throwBottleAir && !this.bottleSplashed) {
                 this.playAnimation(ImageHub.SALSA_BOTTLE.rotation);
             } else if (this.bottleSplashed && !this.throwBottleRemoved) {
@@ -86,6 +86,7 @@ export class ThrowableObject extends MoveableObject {
                     splashIndex++;
                 } else {
                     this.throwBottleRemoved = true;
+                    clearInterval(this.animateInterval);
                 }
             }
         }, 1000 / 20);
