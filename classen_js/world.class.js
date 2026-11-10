@@ -26,6 +26,8 @@ export class World {
     static camera_x = 0;
     coins = 0;
     bottles = 0;
+    totalCoins = 0;
+    totalBottles = 0;
     collectableCoins;
     collectableBottles;
     statusbarHealth = new Statusbar("health", 20, 0, 100);
@@ -47,6 +49,8 @@ export class World {
         this.ctx = canvas.getContext("2d");
         World.canvas = canvas;
         this.level = addLevel1();
+        this.totalCoins = this.level.collectableCoins.length;
+        this.totalBottles = this.level.collectableBottles.length;
         this.character = new Character(this);
         this.endboss = this.level.endboss;
         if (this.endboss) this.endboss.world = this;
@@ -105,7 +109,8 @@ export class World {
         this.throwableObjects.push(bottle);
         this.character.lastMove = new Date().getTime();
         this.bottles--;
-        this.statusbarBottles.setPercentage(this.bottles * 10);
+        const bottlePercentage = (this.bottles / this.totalBottles) * 100;
+        this.statusbarBottles.setPercentage(bottlePercentage);
     }
 
     /** Runs all player, enemy, collectible, and projectile collision checks. */
@@ -114,8 +119,6 @@ export class World {
         this.checkCollisionEndboss();
         this.checkCollisionCoins();
         this.checkCollisionBottles();
-        // this.checkBottleHitEndboss();
-        // this.checkBottleHitEnemy();
         this.bottlesCollisionEnemy();
     }
 
@@ -249,7 +252,8 @@ export class World {
             if (this.character.isColliding(coins)) {
                 this.coins++;
                 this.level.collectableCoins.splice(index, 1);
-                this.statusbarCoins.setPercentage(Math.round(this.coins * 3.33));
+                const coinPercentage = (this.coins / this.totalCoins) * 100;
+                this.statusbarCoins.setPercentage(Math.round(coinPercentage));
                 AudioHub.PLAY_ONE(AudioHub.COLLECT_COIN);
             }
         });
@@ -261,7 +265,8 @@ export class World {
             if (this.character.isColliding(bottle)) {
                 this.bottles++;
                 this.level.collectableBottles.splice(index, 1);
-                this.statusbarBottles.setPercentage(this.bottles * 10);
+                const bottlePercentage = (this.bottles / this.totalBottles) * 100;
+                this.statusbarBottles.setPercentage(bottlePercentage);
                 AudioHub.PLAY_ONE(AudioHub.COLLECT_BOTTLE);
             }
         });
