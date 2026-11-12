@@ -56,7 +56,7 @@ function preventMultiTouchZoom() {
     document.addEventListener(
         "touchstart",
         (e) => {
-            if (e.touches.length > 1) e.preventDefault();
+            if (e.touches.length > 1 && e.cancelable) e.preventDefault();
         },
         { passive: false },
     );
@@ -69,7 +69,7 @@ function preventDoubleTapZoom() {
         "touchend",
         (e) => {
             const now = new Date().getTime();
-            if (now - lastTouchEnd <= 300) e.preventDefault();
+            if (now - lastTouchEnd <= 300 && e.cancelable) e.preventDefault();
             lastTouchEnd = now;
         },
         { passive: false },
@@ -264,7 +264,7 @@ function bindTouchStart(btn, keyboardKey) {
  */
 function bindTouchEnd(btn, keyboardKey) {
     btn.addEventListener("touchend", (e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         Keyboard[keyboardKey] = false;
         if (keyboardKey === "LEFT" || keyboardKey === "RIGHT") {
             isPepeRunningSoundPlaying = false;
