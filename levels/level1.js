@@ -23,7 +23,7 @@ function createChickens() {
  * @returns {CollectableCoins[]} Coin instances.
  */
 function createCoins() {
-    return [createCoinArc(400), createCoinLine(850), createCoinRow(), createCoinStairs(), createCoinArc(2300), createCoinLine(2800)].flat();
+    return [createCoinArc(400), createCoinRow(), createCoinStairs(), createCoinArc(2300), createCoinLine(2800)].flat();
 }
 
 /** Creates an arc-shaped coin formation.
@@ -31,13 +31,7 @@ function createCoins() {
  * @returns {CollectableCoins[]} Coin instances.
  */
 function createCoinArc(startX) {
-    return [
-        new CollectableCoins(startX, 230),
-        new CollectableCoins(startX + 50, 150),
-        new CollectableCoins(startX + 100, 90),
-        new CollectableCoins(startX + 150, 150),
-        new CollectableCoins(startX + 200, 230),
-    ];
+    return [new CollectableCoins(startX + 100, 90)];
 }
 
 /** Creates a horizontal coin line.
@@ -45,26 +39,26 @@ function createCoinArc(startX) {
  * @returns {CollectableCoins[]} Coin instances.
  */
 function createCoinLine(startX) {
-    return [0, 50, 100, 150, 200].map((offset) => new CollectableCoins(startX + offset, 100));
+    return [0].map((offset) => new CollectableCoins(startX + offset, 100));
 }
 
 /** Creates the low horizontal coin row.
  * @returns {CollectableCoins[]} Coin instances.
  */
 function createCoinRow() {
-    return [1350, 1400, 1450, 1500, 1550].map((x) => new CollectableCoins(x, 250));
+    return [1350].map((x) => new CollectableCoins(x, 250));
 }
 
 /** Creates ascending coins.
  * @returns {CollectableCoins[]} Coin instances.
  */
 function createCoinStairs() {
-    return [1800, 1850, 1900, 1950, 2000].map((x, index) => new CollectableCoins(x, 240 - index * 40));
+    return [1800].map((x, index) => new CollectableCoins(x, 240 - index * 40));
 }
 
 /** Creates the bottle pickup positions.
  * @returns {CollectableBottles[]} Bottle instances.
  */
 function createBottles() {
-    return [200, 400, 800, 1200, 1600, 1800, 2200, 2600, 3000, 3400].map((x) => new CollectableBottles(x));
+    return [400, 1200, 1800, 2600, 3400].map((x) => new CollectableBottles(x));
 }

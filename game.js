@@ -9,7 +9,8 @@ let canvas;
 let isPaused;
 let globalVolume = 0.4;
 let highGraphics = true;
-AudioHub.IS_MUTED = true;
+const savedMuted = localStorage.getItem("elPolloLoco_muted");
+AudioHub.IS_MUTED = savedMuted !== null ? savedMuted === "true" : true;
 const volumeSlider = document.getElementById("volume-slider");
 const volumeValue = document.getElementById("volume-value");
 const btnGraphics = document.getElementById("btn-graphics");
@@ -132,9 +133,9 @@ if (volumeSlider) {
         AudioHub.ALL_SOUNDS.forEach((sound) => {
             sound.file.volume = globalVolume;
         });
-        if (sliderVal == 0 && !AudioHub.isMuted) {
+        if (sliderVal == 0 && !AudioHub.IS_MUTED) {
             toggleMute();
-        } else if (sliderVal > 0 && AudioHub.isMuted) {
+        } else if (sliderVal > 0 && AudioHub.IS_MUTED) {
             toggleMute();
         }
     });
@@ -281,11 +282,6 @@ function toggleMute() {
     AudioHub.IS_MUTED = !AudioHub.IS_MUTED;
     localStorage.setItem("elPolloLoco_muted", AudioHub.IS_MUTED);
     updateMuteButtonUI();
-    if (AudioHub.IS_MUTED) {
-        AudioHub.STOP_ALL();
-    } else if (world && !isPaused) {
-        AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
-    }
 }
 
 /** Stops the active game and returns to the landing page. */
@@ -381,4 +377,5 @@ document.querySelectorAll(".btn-restart").forEach((btn) => {
     btn.addEventListener("click", startNewGame);
 });
 
+initAudioSettings();
 updateControlInstructions(isMobileDevice());
