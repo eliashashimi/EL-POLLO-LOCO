@@ -81,14 +81,23 @@ export class ThrowableObject extends MoveableObject {
             if (this.throwBottleAir && !this.bottleSplashed) {
                 this.playAnimation(ImageHub.SALSA_BOTTLE.rotation);
             } else if (this.bottleSplashed && !this.throwBottleRemoved) {
-                if (splashIndex < ImageHub.SALSA_BOTTLE.splash.length) {
-                    this.img = this.imageCache[ImageHub.SALSA_BOTTLE.splash[splashIndex]];
-                    splashIndex++;
-                } else {
-                    this.throwBottleRemoved = true;
-                    clearInterval(this.animateInterval);
-                }
+                splashIndex = this.playSplashFrame(splashIndex);
             }
         }, 1000 / 20);
+    }
+
+    /**
+     * Shows the next splash frame or removes the bottle after the last frame.
+     * @param {number} splashIndex Index of the splash frame to show.
+     * @returns {number} Index of the next splash frame.
+     */
+    playSplashFrame(splashIndex) {
+        if (splashIndex < ImageHub.SALSA_BOTTLE.splash.length) {
+            this.img = this.imageCache[ImageHub.SALSA_BOTTLE.splash[splashIndex]];
+            return splashIndex + 1;
+        }
+        this.throwBottleRemoved = true;
+        clearInterval(this.animateInterval);
+        return splashIndex;
     }
 }

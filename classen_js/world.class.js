@@ -37,9 +37,9 @@ export class World {
     statusbar = {};
     throwableObjects = [];
     isThrowing = false;
-    maxWitdh;
+    maxWidth;
     maxCameraPos;
-    istDestroyed = false;
+    isDestroyed = false;
 
     /**
      * Creates a game world and starts its render and update loops.
@@ -52,15 +52,20 @@ export class World {
         this.totalCoins = this.level.collectableCoins.length;
         this.totalBottles = this.level.collectableBottles.length;
         this.character = new Character(this);
+        this.initLevelReferences();
+        this.draw();
+        this.run();
+        AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
+    }
+
+    /** Links the end boss to this world and stores camera limits and collectible lists. */
+    initLevelReferences() {
         this.endboss = this.level.endboss;
         if (this.endboss) this.endboss.world = this;
         this.maxWidth = this.level.step + World.canvas.width;
         this.maxCameraPos = -this.maxWidth - World.canvas.width;
         this.collectableCoins = this.level.collectableCoins;
         this.collectableBottles = this.level.collectableBottles;
-        this.draw();
-        this.run();
-        AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
     }
 
     /** Starts the recurring collision and projectile checks. */
@@ -76,8 +81,9 @@ export class World {
         }, 1000 / 5);
     }
 
+    /** Marks this world as destroyed so its render loop stops scheduling new frames. */
     destroy() {
-        clearInterval(this.collision);
+        this.isDestroyed = true;
     }
 
     /** Creates a projectile when the current input and player state allow it. */
@@ -274,7 +280,7 @@ export class World {
 
     /** Draws one frame, updates the camera, and schedules the next frame. */
     draw() {
-        if (this.istDestroyed) return;
+        if (this.isDestroyed) return;
         this.ctx.clearRect(0, 0, World.canvas.width, World.canvas.height);
         if (this.character) World.camera_x = -this.character.x + 100;
         if (World.camera_x > 0) World.camera_x = 0;

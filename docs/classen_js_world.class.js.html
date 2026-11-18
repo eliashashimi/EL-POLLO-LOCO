@@ -34,6 +34,7 @@ import { CollectableBottles } from "./collectable-bottles.class.js";
 import { CollectableCoins } from "./collectable-coins.class.js";
 import { Endboss } from "./endboss.class.js";
 import { ImageHub } from "./image-hub.class.js";
+import { IntervalHub } from "./interval-hub.class.js";
 import { Keyboard } from "./keyboard.class.js";
 import { SmallChicken } from "./small-chicken.class.js";
 import { Statusbar } from "./statusbar.class.js";
@@ -53,6 +54,8 @@ export class World {
     static camera_x = 0;
     coins = 0;
     bottles = 0;
+    totalCoins = 0;
+    totalBottles = 0;
     collectableCoins;
     collectableBottles;
     statusbarHealth = new Statusbar("health", 20, 0, 100);
@@ -62,8 +65,9 @@ export class World {
     statusbar = {};
     throwableObjects = [];
     isThrowing = false;
-    maxWitdh;
+    maxWidth;
     maxCameraPos;
+    isDestroyed = false;
 
     /**
      * Creates a game world and starts its render and update loops.
@@ -73,29 +77,41 @@ export class World {
         this.ctx = canvas.getContext("2d");
         World.canvas = canvas;
         this.level = addLevel1();
+        this.totalCoins = this.level.collectableCoins.length;
+        this.totalBottles = this.level.collectableBottles.length;
         this.character = new Character(this);
+        this.initLevelReferences();
+        this.draw();
+        this.run();
+        AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
+    }
+
+    /** Links the end boss to this world and stores camera limits and collectible lists. */
+    initLevelReferences() {
         this.endboss = this.level.endboss;
         if (this.endboss) this.endboss.world = this;
         this.maxWidth = this.level.step + World.canvas.width;
         this.maxCameraPos = -this.maxWidth - World.canvas.width;
         this.collectableCoins = this.level.collectableCoins;
         this.collectableBottles = this.level.collectableBottles;
-        this.draw();
-        this.run();
-        AudioHub.PLAY_ONE(AudioHub.BACKGROUND_MUSIC, true);
     }
 
     /** Starts the recurring collision and projectile checks. */
     run() {
-        setInterval(() => {
+        IntervalHub.startInterval(() => {
             if (window.isGamePaused) return;
             this.setRealFrames();
             this.checkCollisions();
         }, 1000 / 60);
-        setInterval(() => {
+        IntervalHub.startInterval(() => {
             if (window.isGamePaused) return;
             this.checkThrowableObjects();
         }, 1000 / 5);
+    }
+
+    /** Marks this world as destroyed so its render loop stops scheduling new frames. */
+    destroy() {
+        this.isDestroyed = true;
     }
 
     /** Creates a projectile when the current input and player state allow it. */
@@ -127,7 +143,8 @@ export class World {
         this.throwableObjects.push(bottle);
         this.character.lastMove = new Date().getTime();
         this.bottles--;
-        this.statusbarBottles.setPercentage(this.bottles * 10);
+        const bottlePercentage = (this.bottles / this.totalBottles) * 100;
+        this.statusbarBottles.setPercentage(bottlePercentage);
     }
 
     /** Runs all player, enemy, collectible, and projectile collision checks. */
@@ -136,8 +153,6 @@ export class World {
         this.checkCollisionEndboss();
         this.checkCollisionCoins();
         this.checkCollisionBottles();
-        this.checkBottleHitEndboss();
-        this.checkBottleHitEnemy();
         this.bottlesCollisionEnemy();
     }
 
@@ -183,6 +198,7 @@ export class World {
      * @param {ThrowableObject} bottle Projectile being tested.
      */
     checkBottleHitEndboss(enemy, bottle) {
+        if (!bottle || !enemy || bottle.bottleSplashed || enemy.isDead()) return;
         if (enemy instanceof Endboss &amp;&amp; enemy.isColliding(bottle) &amp;&amp; !bottle.bottleSplashed) {
             enemy.hit(20);
             bottle.splash();
@@ -190,7 +206,9 @@ export class World {
             this.statusbarEndboss.setPercentage(enemy.energy);
             if (enemy.isDead()) {
                 setTimeout(() => {
-                    window.showGameWin();
+                    if (!window.isGameOver) {
+                        window.showGameWin();
+                    }
                 }, 1500);
             }
         }
@@ -268,7 +286,8 @@ export class World {
             if (this.character.isColliding(coins)) {
                 this.coins++;
                 this.level.collectableCoins.splice(index, 1);
-                this.statusbarCoins.setPercentage(Math.round(this.coins * 3.33));
+                const coinPercentage = (this.coins / this.totalCoins) * 100;
+                this.statusbarCoins.setPercentage(Math.round(coinPercentage));
                 AudioHub.PLAY_ONE(AudioHub.COLLECT_COIN);
             }
         });
@@ -280,7 +299,8 @@ export class World {
             if (this.character.isColliding(bottle)) {
                 this.bottles++;
                 this.level.collectableBottles.splice(index, 1);
-                this.statusbarBottles.setPercentage(this.bottles * 10);
+                const bottlePercentage = (this.bottles / this.totalBottles) * 100;
+                this.statusbarBottles.setPercentage(bottlePercentage);
                 AudioHub.PLAY_ONE(AudioHub.COLLECT_BOTTLE);
             }
         });
@@ -288,6 +308,7 @@ export class World {
 
     /** Draws one frame, updates the camera, and schedules the next frame. */
     draw() {
+        if (this.isDestroyed) return;
         this.ctx.clearRect(0, 0, World.canvas.width, World.canvas.height);
         if (this.character) World.camera_x = -this.character.x + 100;
         if (World.camera_x > 0) World.camera_x = 0;
@@ -309,7 +330,9 @@ export class World {
         this.addToMap(this.statusbarHealth);
         this.addToMap(this.statusbarCoins);
         this.addToMap(this.statusbarBottles);
-        this.addToMap(this.statusbarEndboss);
+        if (this.endboss &amp;&amp; this.endboss.hadfirstSight) {
+            this.addToMap(this.statusbarEndboss);
+        }
     }
 
     /** Refreshes collision frames for all active game objects. */
@@ -383,13 +406,13 @@ export class World {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AudioHub.html">AudioHub</a></li><li><a href="BackgroundObject.html">BackgroundObject</a></li><li><a href="Character.html">Character</a></li><li><a href="Chicken.html">Chicken</a></li><li><a href="Cloud.html">Cloud</a></li><li><a href="CollectableBottles.html">CollectableBottles</a></li><li><a href="CollectableCoins.html">CollectableCoins</a></li><li><a href="DrawableObject.html">DrawableObject</a></li><li><a href="Endboss.html">Endboss</a></li><li><a href="ImageHub.html">ImageHub</a></li><li><a href="IntervalHub.html">IntervalHub</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="Level.html">Level</a></li><li><a href="MoveableObject.html">MoveableObject</a></li><li><a href="MyAudio.html">MyAudio</a></li><li><a href="SmallChicken.html">SmallChicken</a></li><li><a href="Statusbar.html">Statusbar</a></li><li><a href="ThrowableObject.html">ThrowableObject</a></li><li><a href="World.html">World</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addLevel1">addLevel1</a></li><li><a href="global.html#backToHome">backToHome</a></li><li><a href="global.html#bindTouchButton">bindTouchButton</a></li><li><a href="global.html#bindTouchEnd">bindTouchEnd</a></li><li><a href="global.html#bindTouchStart">bindTouchStart</a></li><li><a href="global.html#checkIsMobile">checkIsMobile</a></li><li><a href="global.html#createBottles">createBottles</a></li><li><a href="global.html#createChickens">createChickens</a></li><li><a href="global.html#createCoinArc">createCoinArc</a></li><li><a href="global.html#createCoinLine">createCoinLine</a></li><li><a href="global.html#createCoinRow">createCoinRow</a></li><li><a href="global.html#createCoinStairs">createCoinStairs</a></li><li><a href="global.html#createCoins">createCoins</a></li><li><a href="global.html#hideEndScreens">hideEndScreens</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initAudioSettings">initAudioSettings</a></li><li><a href="global.html#instructionsTemp">instructionsTemp</a></li><li><a href="global.html#isMobileDevice">isMobileDevice</a></li><li><a href="global.html#mobileInstructionsTemp">mobileInstructionsTemp</a></li><li><a href="global.html#preventDoubleTapZoom">preventDoubleTapZoom</a></li><li><a href="global.html#preventMultiTouchZoom">preventMultiTouchZoom</a></li><li><a href="global.html#startNewGame">startNewGame</a></li><li><a href="global.html#toggleMute">toggleMute</a></li><li><a href="global.html#togglePause">togglePause</a></li><li><a href="global.html#updateControlInstructions">updateControlInstructions</a></li><li><a href="global.html#updateMuteAudio">updateMuteAudio</a></li><li><a href="global.html#updateMuteButtonUI">updateMuteButtonUI</a></li><li><a href="global.html#updateMuteIcons">updateMuteIcons</a></li><li><a href="global.html#zoomLock">zoomLock</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AudioHub.html">AudioHub</a></li><li><a href="BackgroundObject.html">BackgroundObject</a></li><li><a href="Character.html">Character</a></li><li><a href="Chicken.html">Chicken</a></li><li><a href="Cloud.html">Cloud</a></li><li><a href="CollectableBottles.html">CollectableBottles</a></li><li><a href="CollectableCoins.html">CollectableCoins</a></li><li><a href="DrawableObject.html">DrawableObject</a></li><li><a href="Endboss.html">Endboss</a></li><li><a href="ImageHub.html">ImageHub</a></li><li><a href="IntervalHub.html">IntervalHub</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="Level.html">Level</a></li><li><a href="MoveableObject.html">MoveableObject</a></li><li><a href="MyAudio.html">MyAudio</a></li><li><a href="SmallChicken.html">SmallChicken</a></li><li><a href="Statusbar.html">Statusbar</a></li><li><a href="ThrowableObject.html">ThrowableObject</a></li><li><a href="World.html">World</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addLevel1">addLevel1</a></li><li><a href="global.html#backToHome">backToHome</a></li><li><a href="global.html#bindTouchButton">bindTouchButton</a></li><li><a href="global.html#bindTouchEnd">bindTouchEnd</a></li><li><a href="global.html#bindTouchStart">bindTouchStart</a></li><li><a href="global.html#checkIsMobile">checkIsMobile</a></li><li><a href="global.html#createBottles">createBottles</a></li><li><a href="global.html#createChickens">createChickens</a></li><li><a href="global.html#createCoinArc">createCoinArc</a></li><li><a href="global.html#createCoinLine">createCoinLine</a></li><li><a href="global.html#createCoinRow">createCoinRow</a></li><li><a href="global.html#createCoinStairs">createCoinStairs</a></li><li><a href="global.html#createCoins">createCoins</a></li><li><a href="global.html#hideEndScreens">hideEndScreens</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initApp">initApp</a></li><li><a href="global.html#initAudioSettings">initAudioSettings</a></li><li><a href="global.html#initGraphicsButton">initGraphicsButton</a></li><li><a href="global.html#initHomeButtons">initHomeButtons</a></li><li><a href="global.html#initImpressumNavigation">initImpressumNavigation</a></li><li><a href="global.html#initIngameButtons">initIngameButtons</a></li><li><a href="global.html#initKeyboardControls">initKeyboardControls</a></li><li><a href="global.html#initMenuNavigation">initMenuNavigation</a></li><li><a href="global.html#initRestartButtons">initRestartButtons</a></li><li><a href="global.html#initTouchControls">initTouchControls</a></li><li><a href="global.html#initVolumeSlider">initVolumeSlider</a></li><li><a href="global.html#instructionsTemp">instructionsTemp</a></li><li><a href="global.html#isMobileDevice">isMobileDevice</a></li><li><a href="global.html#loadMutedState">loadMutedState</a></li><li><a href="global.html#mobileInstructionsTemp">mobileInstructionsTemp</a></li><li><a href="global.html#onHomeClick">onHomeClick</a></li><li><a href="global.html#onKeyDown">onKeyDown</a></li><li><a href="global.html#onKeyUp">onKeyUp</a></li><li><a href="global.html#onVolumeInput">onVolumeInput</a></li><li><a href="global.html#preventDoubleTapZoom">preventDoubleTapZoom</a></li><li><a href="global.html#preventMultiTouchZoom">preventMultiTouchZoom</a></li><li><a href="global.html#setKeyState">setKeyState</a></li><li><a href="global.html#startNewGame">startNewGame</a></li><li><a href="global.html#switchScreen">switchScreen</a></li><li><a href="global.html#syncMuteWithVolume">syncMuteWithVolume</a></li><li><a href="global.html#toggleGraphics">toggleGraphics</a></li><li><a href="global.html#toggleMute">toggleMute</a></li><li><a href="global.html#togglePause">togglePause</a></li><li><a href="global.html#updateControlInstructions">updateControlInstructions</a></li><li><a href="global.html#updateMuteAudio">updateMuteAudio</a></li><li><a href="global.html#updateMuteButtonUI">updateMuteButtonUI</a></li><li><a href="global.html#updateMuteIcons">updateMuteIcons</a></li><li><a href="global.html#zoomLock">zoomLock</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Sep 14 2026 07:38:12 GMT+0200 (Mitteleuropäische Sommerzeit)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Nov 18 2026 22:03:25 GMT+0100 (Mitteleuropäische Normalzeit)
 </footer>
 
 <script> prettyPrint(); </script>
